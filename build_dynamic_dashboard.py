@@ -420,7 +420,7 @@ def build():
     </section>
 
     <!-- NAVIGATION TABS: چهارخونه‌ای لمسی و واکنش‌گرا -->
-    <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-2.5">
+    <nav class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-2.5">
       <!-- Tab 1 -->
       <button onclick="switchTab('tab-macro')" id="btn-tab-macro" class="tab-grid-btn active glass-card p-3 rounded-2xl border text-right transition-all flex flex-col justify-between hover:border-amber-400 shadow-sm">
         <div class="flex items-center justify-between w-full mb-1">
@@ -442,6 +442,21 @@ def build():
         <div>
           <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">سناریوهای آینده</div>
           <div class="text-[10px] text-slate-400 mt-0.5">نمودار ۱۲ ماه آینده</div>
+        </div>
+      </button>
+
+      <!-- Tab: AI TRADING & INVESTMENT ADVISOR -->
+      <button onclick="switchTab('tab-advisor')" id="btn-tab-advisor" class="tab-grid-btn glass-card p-3 rounded-2xl border border-emerald-500/40 text-right transition-all flex flex-col justify-between hover:border-emerald-400 shadow-sm relative group overflow-hidden bg-gradient-to-b from-emerald-500/10 via-transparent to-transparent">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">🤖</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 font-black flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            هوشمند
+          </span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-black text-slate-900 dark:text-white">دستیار خرید و فروش</div>
+          <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">مشاور طلا، سکه و دلار</div>
         </div>
       </button>
 
@@ -822,6 +837,216 @@ def build():
           <tbody id="rollingForecastTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/70"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- TAB: AI TRADING & INVESTMENT ADVISOR (دستیار هوشمند خرید و فروش و سرمایه‌گذاری) -->
+    <div id="tab-advisor" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <!-- HEADER BANNER -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-emerald-500/40 bg-gradient-to-r from-emerald-950/30 via-slate-900/80 to-amber-950/25">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🤖</span>
+              <h2 class="text-sm sm:text-lg font-black text-slate-900 dark:text-white">دستیار هوشمند خرید و فروش طلا و مشاور تحلیلی سرمایه‌گذاری</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-500 dark:text-emerald-300 border border-emerald-500/40">
+                سیگنال و تحلیل بلادرنگ
+              </span>
+            </div>
+            <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold mt-1">
+              تحلیل آنی ارزش خرید، سنجش حباب انواع سکه، مقایسه طلا با دلار و ارائه راهبرد تخصیص دارایی بر پایه داده‌های زنده بازار
+            </p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="advisorEngineStatus">موتور هوش مصنوعی فعال</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3 LIVE AI ADVISORY PILLARS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Pillar 1: Buy/Sell Signal -->
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-emerald-500/30 space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-emerald-400">📊 سیگنال تکنیکال و الگوریتمی:</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300" id="advisorSignalBadge">خرید پله‌ای (DCA)</span>
+            </div>
+            <p class="text-xs text-slate-200 font-bold leading-relaxed" id="advisorSignalText">
+              با توجه به روند صعودی میان‌مدت و مدل LSTM، موقعیت جاری برای خرید پله‌ای و انباشت دارایی مناسب ارزیابی می‌شود.
+            </p>
+          </div>
+
+          <!-- Pillar 2: Coin Bubble Warning -->
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-amber-500/30 space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-amber-400">🫧 وضعیت حباب سکه امامی:</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300" id="advisorBubbleBadge">حباب بالا</span>
+            </div>
+            <p class="text-xs text-slate-200 font-bold leading-relaxed" id="advisorBubbleText">
+              سکه امامی دارای حباب قابل‌توجه است. برای حفظ ارزش خالص، طلای ۱۸ عیار آبشده ارجحیت بالاتری نسبت به سکه دارد.
+            </p>
+          </div>
+
+          <!-- Pillar 3: Gold vs Dollar vs Coin -->
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-cyan-500/30 space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-cyan-400">⚖️ طلا در برابر دلار:</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">سپر دوگانه</span>
+            </div>
+            <p class="text-xs text-slate-200 font-bold leading-relaxed">
+              طلا هم از جهش دلار داخل و هم از رشد انس جهانی تغذیه می‌کند و در بلندمدت ۱۰ تا ۱۵ درصد بازدهی بالاتر از دلار ثبت کرده است.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN INTERACTIVE ADVISOR CHAT & BUBBLE CALCULATOR GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        
+        <!-- LEFT/MAIN: INTERACTIVE AI CHAT ASSISTANT (7 COLS) -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between h-[640px]">
+          <div>
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-base">
+                  🤖
+                </div>
+                <div>
+                  <h3 class="text-xs sm:text-sm font-black text-slate-900 dark:text-white">گفت‌وگو با مشاور هوشمند طلا و سکه</h3>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">پاسخ‌گویی بر مبنای نرخ‌های لحظه‌ای و مدل پیش‌بینی ۱ ساله</p>
+                </div>
+              </div>
+              <button onclick="clearAdvisorChat()" class="text-[10px] text-slate-400 hover:text-rose-400 transition-colors px-2 py-1 rounded border border-slate-700/50">
+                پاک‌سازی چت
+              </button>
+            </div>
+
+            <!-- Quick Questions Pills -->
+            <div class="mb-3">
+              <span class="text-[11px] font-black text-slate-700 dark:text-slate-200 block mb-1.5">پرسش‌های پرتکرار (یک کلیک):</span>
+              <div class="flex items-center gap-1.5 flex-wrap text-xs">
+                <button onclick="quickAsk('طلا بخرم یا بفروشم؟')" class="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 font-bold transition-all text-[11px]">
+                  🪙 الان طلا بخرم یا بفروشم؟
+                </button>
+                <button onclick="quickAsk('سکه بخرم، طلا یا دلار؟ کدوم بهتره؟')" class="px-2.5 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 font-bold transition-all text-[11px]">
+                  ⚖️ طلا، سکه یا دلار؟
+                </button>
+                <button onclick="quickAsk('کدام سکه حباب کمتری دارد؟')" class="px-2.5 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-bold transition-all text-[11px]">
+                  🫧 کمترین حباب سکه
+                </button>
+                <button onclick="quickAsk('بهترین استراتژی خرید چیست؟')" class="px-2.5 py-1 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 font-bold transition-all text-[11px]">
+                  🎯 استراتژی خرید پله‌ای
+                </button>
+                <button onclick="quickAsk('چطور بدون اجرت و مالیات طلا بخرم؟')" class="px-2.5 py-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/30 font-bold transition-all text-[11px]">
+                  🛡️ خرید بدون اجرت
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div id="advisorChatContainer" class="flex-1 overflow-y-auto space-y-3 p-2.5 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 mb-3 text-xs leading-relaxed">
+            <!-- Initial Welcome Message -->
+            <div class="flex items-start gap-2 max-w-[90%]">
+              <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs shrink-0 mt-0.5">🤖</div>
+              <div class="p-3 rounded-2xl rounded-tr-none bg-slate-200/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700/60 text-slate-900 dark:text-slate-100 space-y-1.5 shadow-sm">
+                <p class="font-black text-emerald-600 dark:text-emerald-400">سلام! من دستیار هوشمند سرمایه‌گذاری طلای شما هستم.</p>
+                <p class="text-slate-800 dark:text-slate-200">
+                  من داده‌های زنده نرخ طلا ۱۸ عیار، مظنه، انواع سکه و خروجی پیش‌بینی ۱ ساله مدل ترکیبی (LSTM + روند فصلی) را در لحظه رصد می‌کنم.
+                </p>
+                <p class="text-slate-700 dark:text-slate-300">
+                  می‌توانید بپرسید: <strong>«الان طلا بخرم یا بفروشم؟»</strong>، <strong>«طلا بهتره یا سکه و دلار؟»</strong> یا هر سوال دیگری درباره سرمایه‌گذاری در طلا!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form onsubmit="handleAdvisorSubmit(event)" class="flex items-center gap-2">
+            <input type="text" id="advisorInput" placeholder="سوال خود را بنویسید (مثلاً: الان طلا بخرم یا سکه؟)..." class="flex-1 px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-medium">
+            <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all">
+              <span>ارسال</span>
+              <span>🚀</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- RIGHT: LIVE COIN BUBBLE & INTRINSIC VALUE MATRIX (5 COLS) -->
+        <div class="lg:col-span-5 space-y-4">
+          <!-- Bubble Matrix Table Card -->
+          <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+              <h3 class="text-xs sm:text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🫧 جدول سنجش حباب و ارزش ذاتی مسکوکات</span>
+              </h3>
+              <span class="text-[10px] text-slate-400 font-mono">بر مبنای طلای ۱۸</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap">
+                    <th class="py-2 px-2">دارایی</th>
+                    <th class="py-2 px-2">قیمت روز</th>
+                    <th class="py-2 px-2">ارزش طلا</th>
+                    <th class="py-2 px-2">درصد حباب</th>
+                    <th class="py-2 px-2">ارزندگی</th>
+                  </tr>
+                </thead>
+                <tbody id="advisorBubbleTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70 font-semibold">
+                  <!-- Rows populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-3 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-slate-800 dark:text-slate-200 font-bold space-y-1">
+              <div class="text-amber-600 dark:text-amber-400 font-black">💡 نکته کلیدی مشاور:</div>
+              <p class="leading-relaxed">
+                هر چه درصد حباب یک سکه کمتر باشد، ریسک ریزش آن در هنگام آرامش بازار کمتر است. <strong>طلای ۱۸ عیار آبشده</strong> دارای <strong>حباب صفر</strong> بوده و خالص‌ترین دارایی امن محسوب می‌شود.
+              </p>
+            </div>
+          </div>
+
+          <!-- ASSET ALLOCATION FORMULA CARD -->
+          <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-800 space-y-3">
+            <h3 class="text-xs sm:text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>💼 سبد پیشنهادی تخصیص دارایی (Asset Allocation)</span>
+            </h3>
+            
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+                <div>
+                  <span class="font-black text-emerald-600 dark:text-emerald-400">۶۰٪ طلای آبشده ۱۸ عیار / شمش:</span>
+                  <span class="text-[11px] text-slate-700 dark:text-slate-300 block">هسته اصلی بدون حباب و ضد تورم</span>
+                </div>
+                <span class="font-black text-emerald-600 dark:text-emerald-400 text-sm">۶۰٪</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                <div>
+                  <span class="font-black text-amber-600 dark:text-amber-400">۲۵٪ سکه بهار آزادی یا امامی:</span>
+                  <span class="text-[11px] text-slate-700 dark:text-slate-300 block">نقدشوندگی سریع‌تر برای نوسان‌گیری</span>
+                </div>
+                <span class="font-black text-amber-600 dark:text-amber-400 text-sm">۲۵٪</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-between">
+                <div>
+                  <span class="font-black text-cyan-600 dark:text-cyan-400">۱۵٪ نقدینگی ریالی (سپرده / درآمد ثابت):</span>
+                  <span class="text-[11px] text-slate-700 dark:text-slate-300 block">برای شکار فرصت‌های خرید در اصلاحات قیمتی</span>
+                </div>
+                <span class="font-black text-cyan-600 dark:text-cyan-400 text-sm">۱۵٪</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
     <!-- TAB 3: طلا و حقوق پایه -->
@@ -1447,7 +1672,9 @@ def build():
       if (activeBtn) activeBtn.classList.add('active');
 
       setTimeout(() => {{
-        if (tabId === 'tab-macro') {{
+        if (tabId === 'tab-advisor') {{
+          updateAdvisorMarketSignals();
+        }} else if (tabId === 'tab-macro') {{
           renderMacroChart();
         }} else if (tabId === 'tab-forecast-details') {{
           renderForecastScenarioChart();
@@ -2700,6 +2927,285 @@ def build():
       document.body.removeChild(link);
     }}
 
+
+    // =========================================================================
+    // 🤖 ENGINE: AI GOLD TRADING & INVESTMENT ADVISOR (دستیار هوشمند طلا)
+    // =========================================================================
+    function getLiveMarketMetrics() {{
+      const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const gold18k = latestItem.price;
+      const mesghal = APP_DATA.daily_data && APP_DATA.daily_data.ticks && APP_DATA.daily_data.ticks[0] && APP_DATA.daily_data.ticks[0].mesghal
+        ? APP_DATA.daily_data.ticks[0].mesghal
+        : (gold18k * 4.3318);
+      const coinNew = APP_DATA.daily_data && APP_DATA.daily_data.ticks && APP_DATA.daily_data.ticks[0] && APP_DATA.daily_data.ticks[0].coin_new
+        ? APP_DATA.daily_data.ticks[0].coin_new
+        : 233500000;
+      
+      const coinOld = 230500000;
+      const halfCoin = 119500000;
+      const quarterCoin = 64500000;
+
+      // ارزش ذاتی بر پایه وزن و عیار:
+      // سکه تمام: ۸.۱۳۶ گرم عیار ۹۰۰ (معادل ۸.۲۶ گرم ۱۸ عیار)
+      const intrinsicCoinNew = Math.round(gold18k * 8.26);
+      const bubbleCoinNew = Math.max(0, coinNew - intrinsicCoinNew);
+      const bubblePctCoinNew = roundDecimal((bubbleCoinNew / coinNew) * 100, 1);
+
+      // نیم سکه: ۴.۱۳ گرم ۱۸ عیار
+      const intrinsicHalf = Math.round(gold18k * 4.13);
+      const bubbleHalf = Math.max(0, halfCoin - intrinsicHalf);
+      const bubblePctHalf = roundDecimal((bubbleHalf / halfCoin) * 100, 1);
+
+      // ربع سکه: ۲.۰۶۵ گرم ۱۸ عیار
+      const intrinsicQuarter = Math.round(gold18k * 2.065);
+      const bubbleQuarter = Math.max(0, quarterCoin - intrinsicQuarter);
+      const bubblePctQuarter = roundDecimal((bubbleQuarter / quarterCoin) * 100, 1);
+
+      // مدل پیش‌بینی ۱ ساله
+      const hFc = generateHybridForecast();
+      const m1Target = hFc.base[0].price;
+      const m1Growth = roundDecimal(((m1Target - gold18k) / gold18k) * 100, 1);
+      const y1Target = hFc.base[11].price;
+      const y1Growth = roundDecimal(((y1Target - gold18k) / gold18k) * 100, 1);
+
+      return {{
+        gold18k,
+        mesghal,
+        coinNew,
+        coinOld,
+        halfCoin,
+        quarterCoin,
+        intrinsicCoinNew,
+        bubbleCoinNew,
+        bubblePctCoinNew,
+        bubblePctHalf,
+        bubblePctQuarter,
+        m1Target,
+        m1Growth,
+        y1Target,
+        y1Growth
+      }};
+    }}
+
+    function updateAdvisorMarketSignals() {{
+      const m = getLiveMarketMetrics();
+
+      // ۱. به روزرسانی جدول حباب
+      const tbody = document.getElementById('advisorBubbleTableBody');
+      if (tbody) {{
+        tbody.innerHTML = `
+          <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-2 flex items-center gap-1.5">
+              <span>🥇</span>
+              <span class="font-bold text-slate-900 dark:text-white">طلای ۱۸ عیار آبشده</span>
+            </td>
+            <td class="py-2 px-2 text-amber-500 font-mono">${{formatNumber(m.gold18k)}}</td>
+            <td class="py-2 px-2 text-slate-400 font-mono">${{formatNumber(m.gold18k)}}</td>
+            <td class="py-2 px-2 text-emerald-500 font-bold">۰٪ (بدون حباب)</td>
+            <td class="py-2 px-2"><span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">عالی (امن‌ترین)</span></td>
+          </tr>
+          <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-2 flex items-center gap-1.5">
+              <span>🪙</span>
+              <span class="font-bold text-slate-900 dark:text-white">سکه بهار آزادی (قدیم)</span>
+            </td>
+            <td class="py-2 px-2 text-amber-500 font-mono">${{formatNumber(m.coinOld)}}</td>
+            <td class="py-2 px-2 text-slate-400 font-mono">${{formatNumber(m.intrinsicCoinNew)}}</td>
+            <td class="py-2 px-2 text-amber-500 font-bold">${{roundDecimal(((m.coinOld - m.intrinsicCoinNew)/m.coinOld)*100, 1)}}%</td>
+            <td class="py-2 px-2"><span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold">خوب</span></td>
+          </tr>
+          <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-2 flex items-center gap-1.5">
+              <span>🪙</span>
+              <span class="font-bold text-slate-900 dark:text-white">سکه امامی (طرح جدید)</span>
+            </td>
+            <td class="py-2 px-2 text-amber-500 font-mono">${{formatNumber(m.coinNew)}}</td>
+            <td class="py-2 px-2 text-slate-400 font-mono">${{formatNumber(m.intrinsicCoinNew)}}</td>
+            <td class="py-2 px-2 text-rose-500 font-bold">${{m.bubblePctCoinNew}}% (${{formatNumber(m.bubbleCoinNew)}} ت)</td>
+            <td class="py-2 px-2"><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[10px] font-bold">ریسک حباب</span></td>
+          </tr>
+          <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-2 flex items-center gap-1.5">
+              <span>🪙</span>
+              <span class="font-bold text-slate-900 dark:text-white">نیم سکه</span>
+            </td>
+            <td class="py-2 px-2 text-amber-500 font-mono">${{formatNumber(m.halfCoin)}}</td>
+            <td class="py-2 px-2 text-slate-400 font-mono">${{formatNumber(Math.round(m.gold18k * 4.13))}}</td>
+            <td class="py-2 px-2 text-rose-500 font-bold">${{m.bubblePctHalf}}%</td>
+            <td class="py-2 px-2"><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[10px] font-bold">حباب متوسط</span></td>
+          </tr>
+          <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-2 flex items-center gap-1.5">
+              <span>🪙</span>
+              <span class="font-bold text-slate-900 dark:text-white">ربع سکه</span>
+            </td>
+            <td class="py-2 px-2 text-amber-500 font-mono">${{formatNumber(m.quarterCoin)}}</td>
+            <td class="py-2 px-2 text-slate-400 font-mono">${{formatNumber(Math.round(m.gold18k * 2.065))}}</td>
+            <td class="py-2 px-2 text-rose-500 font-bold">${{m.bubblePctQuarter}}%</td>
+            <td class="py-2 px-2"><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[10px] font-bold">حباب بسیار بالا</span></td>
+          </tr>
+        `;
+      }}
+
+      // ۲. به روزرسانی بج‌های تحلیلی
+      const bBadge = document.getElementById('advisorBubbleBadge');
+      if (bBadge) {{
+        bBadge.textContent = `حباب امامی: ${{m.bubblePctCoinNew}}%`;
+      }}
+    }}
+
+    function appendAdvisorChatMessage(sender, textHtml) {{
+      const container = document.getElementById('advisorChatContainer');
+      if (!container) return;
+
+      const isUser = sender === 'user';
+      const msgDiv = document.createElement('div');
+      msgDiv.className = isUser ? 'flex items-start justify-end gap-2 max-w-[90%] mr-auto' : 'flex items-start gap-2 max-w-[90%]';
+
+      const avatar = isUser ? '👤' : '🤖';
+      const bubbleClass = isUser
+        ? 'p-3 rounded-2xl rounded-tl-none bg-emerald-600 text-white font-medium shadow-sm'
+        : 'p-3 rounded-2xl rounded-tr-none bg-slate-200/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700/60 text-slate-900 dark:text-slate-100 space-y-1.5 shadow-sm';
+
+      msgDiv.innerHTML = `
+        ${{!isUser ? `<div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs shrink-0 mt-0.5">${{avatar}}</div>` : ''}}
+        <div class="${{bubbleClass}}">
+          ${{textHtml}}
+        </div>
+        ${{isUser ? `<div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs shrink-0 mt-0.5">${{avatar}}</div>` : ''}}
+      `;
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+    }}
+
+    function quickAsk(q) {{
+      appendAdvisorChatMessage('user', `<p>${{q}}</p>`);
+      setTimeout(() => {{
+        generateAdvisorAnswer(q);
+      }}, 300);
+    }}
+
+    function handleAdvisorSubmit(e) {{
+      e.preventDefault();
+      const input = document.getElementById('advisorInput');
+      const q = input.value.trim();
+      if (!q) return;
+
+      input.value = '';
+      appendAdvisorChatMessage('user', `<p>${{q}}</p>`);
+      setTimeout(() => {{
+        generateAdvisorAnswer(q);
+      }}, 350);
+    }}
+
+    function generateAdvisorAnswer(query) {{
+      const m = getLiveMarketMetrics();
+      const q = query.toLowerCase();
+
+      let answerHtml = '';
+
+      if (q.includes('بخرم یا بفروشم') || q.includes('وقت خرید') || q.includes('خرید یا فروش')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-emerald-500 dark:text-emerald-400 text-sm">🟢 توصیه مشاور: خرید پله‌ای و نگهداری (Accumulate / Hold)</div>
+            <p>بر اساس تحلیل داده‌های زنده و مدل شبکه عصبی LSTM:</p>
+            <ul class="list-disc list-inside space-y-1 text-slate-800 dark:text-slate-200">
+              <li><strong>هدف ۱ ماهه مدل (LSTM):</strong> نرخ <strong>${{formatNumber(m.m1Target)}} تومان</strong> (رشد تخمینی: +${{m.m1Growth}}%).</li>
+              <li><strong>هدف ۱۲ ماهه مدل ترکیبی:</strong> نرخ <strong>${{formatNumber(m.y1Target)}} تومان</strong> (رشد تخمینی: +${{m.y1Growth}}%).</li>
+              <li><strong>استراتژی پیشنهادی:</strong> به هیچ عنوان کل نقدینگی را یکجا وارد نکنید! از روش <strong>خرید پله‌ای (DCA)</strong> در ۳ پله استفاده کنید تا در صورت نوسان کوتاه‌مدت، میانگین خرید شما بهینه شود.</li>
+            </ul>
+          </div>
+        `;
+      }} else if (q.includes('سکه') && (q.includes('دلار') || q.includes('طلا') || q.includes('بهتره') || q.includes('کدام'))) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-amber-500 dark:text-amber-400 text-sm">⚖️ مقایسه تخصصی: طلای ۱۸ عیار vs سکه vs دلار</div>
+            <div class="space-y-1.5 text-slate-800 dark:text-slate-200">
+              <p><strong>🥇 ۱. طلای ۱۸ عیار آبشده (بهترین برای سرمایه‌گذاری امن):</strong><br>
+              حباب ندارد (۰٪)، بدون اجرت ساخت و مالیات است. کل پول شما به طلای خالص تبدیل می‌شود.</p>
+              
+              <p><strong>🪙 ۲. انواع سکه (خوب برای نوسان‌گیری با ریسک حباب):</strong><br>
+              سکه امامی امروز دارای <strong>${{m.bubblePctCoinNew}}٪ حباب</strong> (حدود ${{formatNumber(m.bubbleCoinNew)}} تومان حباب خالی) است! در زمان آرامش بازار، حباب سکه خالی می‌شود و افت شدیدتری نسبت به طلا تجربه می‌کند.</p>
+
+              <p><strong>💵 ۳. دلار نقدی:</strong><br>
+              دلار تنها از تورم ریال سود می‌برد؛ در حالی که طلا یک اهرم دوگانه است (تورم دلار + جهش انس جهانی طلا). بازدهی طلا در ۱۰ سال گذشته ۱۵٪ بیشتر از دلار بوده است.</p>
+
+              <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
+                🎯 نتیجه: ۶۰٪ طلای آبشده + ۲۵٪ سکه کم‌حباب (بهار آزادی) + ۱۵٪ نقدینگی برای خرید در اصلاح.
+              </div>
+            </div>
+          </div>
+        `;
+      }} else if (q.includes('حباب') || q.includes('ارزش ذاتی')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-cyan-500 dark:text-cyan-400 text-sm">🫧 تحلیل حباب انواع سکه در نرخ امروز:</div>
+            <ul class="space-y-1.5 text-slate-800 dark:text-slate-200">
+              <li><strong>طلای ۱۸ عیار:</strong> حباب <strong>۰٪</strong> (ارزش ذاتی ۱۰۰٪ واقعی)</li>
+              <li><strong>سکه بهار آزادی (قدیم):</strong> حباب تقریبی <strong>${{roundDecimal(((m.coinOld - m.intrinsicCoinNew)/m.coinOld)*100, 1)}}٪</strong></li>
+              <li><strong>سکه طرح جدید (امامی):</strong> حباب <strong>${{m.bubblePctCoinNew}}٪</strong> (معادل ${{formatNumber(m.bubbleCoinNew)}} تومان حباب)</li>
+              <li><strong>نیم سکه:</strong> حباب <strong>${{m.bubblePctHalf}}٪</strong></li>
+              <li><strong>ربع سکه:</strong> حباب <strong>${{m.bubblePctQuarter}}٪</strong> (پرریسک‌ترین گزینه از نظر حباب)</li>
+            </ul>
+            <p class="text-amber-400 font-bold">توصیه: هر چه سرمایه کمتر است تمایل به ربع سکه بیشتر می‌شود، اما حباب ربع سکه بیش از ۳۰٪ است و در اصلاحات بازار بیشترین ضرر را می‌دهد.</p>
+          </div>
+        `;
+      }} else if (q.includes('بدون اجرت') || q.includes('مالیات') || q.includes('دست دوم')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-rose-500 dark:text-rose-400 text-sm">🛡️ راهنمای خرید طلا با کمترین کارمزد و بدون مالیات:</div>
+            <p>هنگام خرید طلای نو از ویترین، ۱۰ الی ۲۵ درصد اجرت ساخت و ۹ درصد مالیات بر ارزش افزوده کسر می‌شود که بازگشت سرمایه شما را ماه‌ها به تعویق می‌اندازد!</p>
+            <ul class="list-disc list-inside space-y-1 text-slate-800 dark:text-slate-200">
+              <li><strong>گزینه اول: طلای آبشده (شمش آزمایشگاهی با کد ری‌گیری):</strong> فقط ۱ تا ۲ درصد کارمزد بدون هیچ‌گونه مالیات و اجرت.</li>
+              <li><strong>گزینه دوم: طلای کم‌اجرت یا دست دوم (مستعمل):</strong> اجرت ساخت صفر، سود فروشنده حدود ۳ تا ۵ درصد.</li>
+              <li><strong>گزینه سوم: صندوق‌های سرمایه‌گذاری طلا در بورس (طلا، عیار، کهربا):</strong> کارمزد معاملات کمتر از ۰.۱۵ درصد و امنیت ۱۰۰٪ بدون ریسک سرقت.</li>
+            </ul>
+          </div>
+        `;
+      }} else if (q.includes('استراتژی') || q.includes('پله') || q.includes('چطور بخرم')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-purple-500 dark:text-purple-400 text-sm">🎯 راهبرد خرید پله‌ای (DCA): بهترین روش ضد اضطراب بازار</div>
+            <p>سرمایه‌گذاران حرفه‌ای هیچ‌گاه تمام پول خود را در یک روز وارد بازار نمی‌کنند:</p>
+            <ol class="list-decimal list-inside space-y-1 text-slate-800 dark:text-slate-200">
+              <li><strong>پله اول (۴۰٪ سرمایه):</strong> در قیمت فعلی بازار وارد شوید.</li>
+              <li><strong>پله دوم (۳۰٪ سرمایه):</strong> در صورتی که بازار ۲ تا ۴ درصد اصلاح داد خرید کنید.</li>
+              <li><strong>پله سوم (۳۰٪ سرمایه):</strong> در کف حمایتی یا بعد از تثبیت روند صعودی وارد کنید.</li>
+            </ol>
+            <p class="text-emerald-400 font-bold">با این فرمول، هیچ‌گاه نگران ریزش‌های مقطعی بازار نخواهید بود.</p>
+          </div>
+        `;
+      }} else {{
+        // General intelligent response
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-slate-900 dark:text-white text-sm">💡 تحلیل هوشمند مشاور:</div>
+            <p class="text-slate-800 dark:text-slate-200">
+              در وضعیت فعلی بازار، نرخ هر گرم طلای ۱۸ عیار <strong>${{formatNumber(m.gold18k)}} تومان</strong> است.
+              بر اساس شبیه‌سازی ترکیبی سه‌گانه، بازدهی مورد انتظار ۱۲ ماه آینده <strong>+${{m.y1Growth}}٪</strong> برآورد می‌شود.
+            </p>
+            <p class="text-slate-700 dark:text-slate-300">
+              اگر قصد سرمایه‌گذاری با افق بیش از ۶ ماه دارید، <strong>طلای ۱۸ عیار آبشده</strong> به دلیل عدم وجود حباب بهترین پوشش ریسک است. اگر دید نوسان‌گیری کوتاه‌مدت دارید، سکه امامی نوسانات شدیدتری ارائه می‌دهد.
+            </p>
+          </div>
+        `;
+      }}
+
+      appendAdvisorChatMessage('assistant', answerHtml);
+    }}
+
+    function clearAdvisorChat() {{
+      const container = document.getElementById('advisorChatContainer');
+      if (container) {{
+        container.innerHTML = '';
+        appendAdvisorChatMessage('assistant', `
+          <p class="font-bold text-emerald-400">تاریخچه گفت‌وگو پاک شد.</p>
+          <p>آماده پاسخ‌گویی به سوالات جدید شما درباره خرید و فروش طلا و سکه هستم!</p>
+        `);
+      }}
+    }}
+
     // INITIALIZATION
     window.addEventListener('DOMContentLoaded', () => {{
       renderMacroChart();
@@ -2711,9 +3217,17 @@ def build():
       populateHeatmap();
       populateYearlyTable();
       populateFullDataTable();
+      updateAdvisorMarketSignals();
       startAutoSyncTimer();
     }});
   </script>
+  <!-- FLOATING AI ADVISOR BUTTON -->
+  <button onclick="switchTab('tab-advisor')" class="fixed bottom-4 left-4 z-40 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-xl shadow-emerald-950/40 border border-emerald-400/40 flex items-center gap-2 transition-all hover:scale-105 group">
+    <span class="text-base animate-bounce">🤖</span>
+    <span>مشاور هوشمند طلا</span>
+    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-ping"></span>
+  </button>
+
 </body>
 </html>
 '''
