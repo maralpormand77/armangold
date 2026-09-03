@@ -239,3 +239,10 @@ def run_server():
 
 if __name__ == '__main__':
     run_server()
+
+# Fallback exports if scanned by cloud serverless builders
+def handler(request=None, *args, **kwargs):
+    return {"statusCode": 200, "body": "OK"}
+app = handler
+application = handler
+

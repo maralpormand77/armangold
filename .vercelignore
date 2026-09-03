@@ -1,0 +1,12 @@
+# Ignore Python scripts from Vercel serverless build (pure static frontend)
+*.py
+requirements.txt
+Procfile
+render.yaml
+*.bat
+*.vbs
+*.xlsx
+*.db
+*.csv
+.env*
+.git*
