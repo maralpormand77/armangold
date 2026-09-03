@@ -3082,11 +3082,10 @@ def build():
 دستورالعمل: به زبان فارسی روان، حرفه‌ای، واقع‌بینانه و بدون کلی‌گویی به سوال کاربر پاسخ بده. اگر مبلغی برای سرمایه‌گذاری ذکر شده، دقیقاً با ارقام بالا حساب کن که چند گرم طلا یا سکه می‌شود و چقدر حباب دارد. راهبرد خرید پله‌ای و مدیریت ریسک را ذکر کن.
 `;
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${{customAiApiKey}}`;
+      const combinedPrompt = systemContext + "\\n\\nسوال کاربر: " + userQuery;
       const payload = {{
         contents: [
-          {{ role: 'user', parts: [{{ text: systemContext + "
-
-سوال کاربر: " + userQuery }}] }}
+          {{ role: 'user', parts: [{{ text: combinedPrompt }}] }}
         ]
       }};
 
@@ -3101,7 +3100,7 @@ def build():
 
         if (data.candidates && data.candidates[0] && data.candidates[0].content) {{
           const aiText = data.candidates[0].content.parts[0].text;
-          const formatted = aiText.replaceAll('\n', '<br>');
+          const formatted = aiText.split(String.fromCharCode(10)).join('<br>');
           appendPopupMessage('assistant', `<div class="space-y-1.5 leading-relaxed">${{formatted}}</div>`);
         }} else {{
           // Fallback to built-in reasoning
