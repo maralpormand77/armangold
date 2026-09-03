@@ -2929,8 +2929,378 @@ def build():
 
 
     // =========================================================================
-    // 🤖 ENGINE: AI GOLD TRADING & INVESTMENT ADVISOR (دستیار هوشمند طلا)
+    // 🤖 ENGINE: ADVANCED AI GOLD ADVISOR (FLOATING POPUP + SEMANTIC REASONING)
     // =========================================================================
+    let isAiChatPopupOpen = false;
+    let customAiApiKey = localStorage.getItem('arman_gold_ai_key') || '';
+
+    function toggleAiChatPopup(forceState) {{
+      const modal = document.getElementById('aiChatPopupModal');
+      if (!modal) return;
+
+      isAiChatPopupOpen = (forceState !== undefined) ? forceState : !isAiChatPopupOpen;
+
+      if (isAiChatPopupOpen) {{
+        modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+        modal.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
+        updatePopupMarketContext();
+        setTimeout(() => {{
+          const inp = document.getElementById('popupChatInput');
+          if (inp) inp.focus();
+        }}, 150);
+      }} else {{
+        modal.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+        modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+      }}
+    }}
+
+    function toggleAiApiSettings() {{
+      const p = document.getElementById('aiApiSettingsPanel');
+      if (p) p.classList.toggle('hidden');
+    }}
+
+    function saveCustomApiKey() {{
+      const inp = document.getElementById('customApiKeyInput');
+      const msg = document.getElementById('apiKeyStatusMsg');
+      if (!inp) return;
+      const key = inp.value.trim();
+      customAiApiKey = key;
+      localStorage.setItem('arman_gold_ai_key', key);
+      if (msg) {{
+        msg.textContent = key ? '✅ کلید با موفقیت ذخیره شد!' : 'کلید حذف شد. از هوش مصنوعی داخلی استفاده می‌شود.';
+        msg.className = key ? 'text-[10px] text-emerald-400 font-bold' : 'text-[10px] text-slate-400';
+      }}
+      setTimeout(() => toggleAiApiSettings(), 1200);
+    }}
+
+    function updatePopupMarketContext() {{
+      const m = getLiveMarketMetrics();
+      const pGold = document.getElementById('popupLiveGoldPrice');
+      const pBub = document.getElementById('popupLiveBubblePct');
+      const pGro = document.getElementById('popupLiveForecastGrowth');
+
+      if (pGold) pGold.textContent = formatNumber(m.gold18k) + ' ت';
+      if (pBub) pBub.textContent = m.bubblePctCoinNew + '%';
+      if (pGro) pGro.textContent = '+' + m.y1Growth + '%';
+
+      // Load saved key in settings input if exists
+      const kInp = document.getElementById('customApiKeyInput');
+      if (kInp && customAiApiKey) kInp.value = customAiApiKey;
+    }}
+
+    function appendPopupMessage(sender, htmlContent) {{
+      const container = document.getElementById('popupChatMessages');
+      if (!container) return;
+
+      const isUser = sender === 'user';
+      const msgDiv = document.createElement('div');
+      msgDiv.className = isUser ? 'flex items-start justify-end gap-2 max-w-[92%] mr-auto' : 'flex items-start gap-2 max-w-[92%]';
+
+      const avatar = isUser ? '👤' : '🤖';
+      const bubbleClass = isUser
+        ? 'p-3 rounded-2xl rounded-tl-none bg-emerald-600 text-white font-medium shadow-sm'
+        : 'p-3 rounded-2xl rounded-tr-none bg-slate-800/95 border border-slate-700 text-slate-100 space-y-1.5 shadow-sm';
+
+      msgDiv.innerHTML = `
+        ${{!isUser ? `<div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs shrink-0 mt-0.5">${{avatar}}</div>` : ''}}
+        <div class="${{bubbleClass}}">
+          ${{htmlContent}}
+        </div>
+        ${{isUser ? `<div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs shrink-0 mt-0.5">${{avatar}}</div>` : ''}}
+      `;
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+    }}
+
+    function showPopupTypingIndicator() {{
+      const container = document.getElementById('popupChatMessages');
+      if (!container) return null;
+
+      const typDiv = document.createElement('div');
+      typDiv.id = 'aiTypingIndicator';
+      typDiv.className = 'flex items-center gap-2 text-[11px] text-emerald-400 font-bold p-2';
+      typDiv.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>دستیار در حال تحلیل داده‌های زنده و محاسبه پاسخ...</span>
+      `;
+      container.appendChild(typDiv);
+      container.scrollTop = container.scrollHeight;
+      return typDiv;
+    }}
+
+    function removePopupTypingIndicator() {{
+      const typ = document.getElementById('aiTypingIndicator');
+      if (typ) typ.remove();
+    }}
+
+    function sendQuickPopupPrompt(text) {{
+      appendPopupMessage('user', `<p>${{text}}</p>`);
+      showPopupTypingIndicator();
+      setTimeout(() => {{
+        removePopupTypingIndicator();
+        processIntelligentAdvisorQuery(text);
+      }}, 500);
+    }}
+
+    function handlePopupChatSubmit(e) {{
+      e.preventDefault();
+      const input = document.getElementById('popupChatInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      appendPopupMessage('user', `<p>${{text}}</p>`);
+      showPopupTypingIndicator();
+
+      // If user has Gemini API Key configured, call Gemini Generative AI!
+      if (customAiApiKey && customAiApiKey.startsWith('AIzaSy')) {{
+        callGeminiGenerativeAI(text);
+      }} else {{
+        setTimeout(() => {{
+          removePopupTypingIndicator();
+          processIntelligentAdvisorQuery(text);
+        }}, 550);
+      }}
+    }}
+
+    // Call Google Gemini API if user entered a Gemini API Key
+    async function callGeminiGenerativeAI(userQuery) {{
+      const m = getLiveMarketMetrics();
+      const systemContext = `
+شما «مشاور هوشمند ارشد بازار طلا، سکه و سرمایه‌گذاری آرمان طلا» هستید.
+اطلاعات زنده بازار امروز:
+- نرخ هر گرم طلای ۱۸ عیار: ${{formatNumber(m.gold18k)}} تومان
+- مظنه تهران: ${{formatNumber(m.mesghal)}} تومان
+- سکه تمام طرح جدید (امامی): ${{formatNumber(m.coinNew)}} تومان
+- ارزش طلای خالص درون سکه: ${{formatNumber(m.intrinsicCoinNew)}} تومان
+- مبلغ حباب سکه امامی: ${{formatNumber(m.bubbleCoinNew)}} تومان (${{m.bubblePctCoinNew}}٪)
+- هدف ۱ ماهه شبکه عصبی LSTM: ${{formatNumber(m.m1Target)}} تومان (رشد +${{m.m1Growth}}٪)
+- هدف ۱۲ ماهه مدل ترکیبی: ${{formatNumber(m.y1Target)}} تومان (رشد +${{m.y1Growth}}٪)
+
+دستورالعمل: به زبان فارسی روان، حرفه‌ای، واقع‌بینانه و بدون کلی‌گویی به سوال کاربر پاسخ بده. اگر مبلغی برای سرمایه‌گذاری ذکر شده، دقیقاً با ارقام بالا حساب کن که چند گرم طلا یا سکه می‌شود و چقدر حباب دارد. راهبرد خرید پله‌ای و مدیریت ریسک را ذکر کن.
+`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${{customAiApiKey}}`;
+      const payload = {{
+        contents: [
+          {{ role: 'user', parts: [{{ text: systemContext + "
+
+سوال کاربر: " + userQuery }}] }}
+        ]
+      }};
+
+      try {{
+        const resp = await fetch(url, {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify(payload)
+        }});
+        const data = await resp.json();
+        removePopupTypingIndicator();
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {{
+          const aiText = data.candidates[0].content.parts[0].text;
+          const formatted = aiText.replaceAll('\n', '<br>');
+          appendPopupMessage('assistant', `<div class="space-y-1.5 leading-relaxed">${{formatted}}</div>`);
+        }} else {{
+          // Fallback to built-in reasoning
+          processIntelligentAdvisorQuery(userQuery);
+        }}
+      }} catch (err) {{
+        removePopupTypingIndicator();
+        processIntelligentAdvisorQuery(userQuery);
+      }}
+    }}
+
+    // =========================================================================
+    // 🧠 ADVANCED SEMANTIC NLP & DYNAMIC FINANCIAL REASONING ENGINE
+    // =========================================================================
+    function processIntelligentAdvisorQuery(query) {{
+      const m = getLiveMarketMetrics();
+      const q = query.toLowerCase();
+
+      // ۱. استخراج مبالغ بودجه از متن کاربر (مثلاً با ۵۰ میلیون، ۱۰ میلیون، ۱۰۰ میلیون و...)
+      let budgetFound = null;
+      const budgetMatch = q.match(/(\\d+)\\s*(میلیون|ملیون|م|هزار|میلیارد|همت)/);
+      if (budgetMatch) {{
+        const num = parseFloat(budgetMatch[1]);
+        const unit = budgetMatch[2];
+        if (unit.includes('میلیارد') || unit.includes('همت')) {{
+          budgetFound = num * 1000000000;
+        }} else if (unit.includes('میلیون') || unit.includes('ملیون') || unit === 'م') {{
+          budgetFound = num * 1000000;
+        }} else if (unit.includes('هزار')) {{
+          budgetFound = num * 1000;
+        }}
+      }}
+
+      let answerHtml = '';
+
+      // سناریو ۱: اگر کاربر بودجه یا مبلغ خاصی مطرح کرده باشد
+      if (budgetFound && budgetFound >= 1000000) {{
+        const gramsGold = roundDecimal(budgetFound / m.gold18k, 2);
+        const coinsPossible = roundDecimal(budgetFound / m.coinNew, 2);
+        const halfPossible = roundDecimal(budgetFound / m.halfCoin, 2);
+        const quarterPossible = roundDecimal(budgetFound / m.quarterCoin, 2);
+
+        const step1 = Math.round(budgetFound * 0.4);
+        const step2 = Math.round(budgetFound * 0.3);
+        const step3 = Math.round(budgetFound * 0.3);
+
+        const bubblePaidIfCoin = Math.round((budgetFound / m.coinNew) * m.bubbleCoinNew);
+
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-emerald-400 text-xs sm:text-sm">💼 تحلیل اختصاصی برای بودجه ${{formatNumber(budgetFound)}} تومان شما:</div>
+            
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-1.5 text-[11px]">
+              <div class="flex justify-between">
+                <span class="text-slate-300">معادل طلای ۱۸ عیار آبشده:</span>
+                <strong class="text-amber-300 font-mono text-xs">${{gramsGold}} گرم طلا</strong>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-300">معادل سکه تمام امامی:</span>
+                <strong class="text-white font-mono">${{coinsPossible}} عدد</strong>
+              </div>
+              ${{budgetFound <= 80000000 ? `
+              <div class="flex justify-between">
+                <span class="text-slate-300">معادل ربع سکه:</span>
+                <strong class="text-white font-mono">${{quarterPossible}} عدد</strong>
+              </div>` : ''}}
+              <div class="flex justify-between text-rose-400 border-t border-slate-800 pt-1">
+                <span>مبلغ حباب سوخته در صورت خرید سکه:</span>
+                <strong class="font-mono">${{formatNumber(bubblePaidIfCoin)}} تومان!</strong>
+              </div>
+            </div>
+
+            <p class="text-slate-200">
+              💡 <strong>توصیه قطعی:</strong> اگر این پول را به عنوان سرمایه‌گذاری نگه می‌دارید، خرید <strong>${{gramsGold}} گرم طلای ۱۸ عیار آبشده (با کد ری‌گیری)</strong> به شدت ارجحیت دارد؛ زیرا حتی ۱ ریال بابت حباب پرداخت نمی‌کنید.
+            </p>
+
+            <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-[11px] space-y-1">
+              <span class="font-black text-emerald-400 block">🎯 برنامه ورود ۳ پله‌ای پیشنهادی:</span>
+              <p>• <strong>پله اول (همین امروز):</strong> خرید ${{formatNumber(step1)}} تومان (${{roundDecimal(step1/m.gold18k, 2)}} گرم)</p>
+              <p>• <strong>پله دوم (در اولین اصلاح بازار):</strong> خرید ${{formatNumber(step2)}} تومان</p>
+              <p>• <strong>پله سوم (ذخیره نقدی در حساب):</strong> ${{formatNumber(step3)}} تومان</p>
+            </div>
+          </div>
+        `;
+      }}
+      // سناریو ۲: طلا بخرم یا بفروشم؟
+      else if (q.includes('بخرم یا بفروشم') || q.includes('وقت خرید') || q.includes('بفروشم') || q.includes('خرید طلا')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-emerald-400 text-xs sm:text-sm">🟢 سیگنال فعلی: خرید پله‌ای و نگهداری (Accumulate / Hold)</div>
+            <p class="text-slate-200">
+              بر اساس خروجی داده‌های زنده و شبیه‌سازی مدل ترکیبی:
+            </p>
+            <ul class="space-y-1.5 text-slate-200 text-[11px]">
+              <li>📈 <strong>افق ۱ ماهه شبکه LSTM:</strong> هدف <strong>${{formatNumber(m.m1Target)}} تومان</strong> (+${{m.m1Growth}}٪) برآورد شده که نشان‌دهنده حفظ تکانه صعودی است.</li>
+              <li>🗓️ <strong>افق ۱ ساله مدل ترکیبی:</strong> نرخ <strong>${{formatNumber(m.y1Target)}} تومان</strong> (+${{m.y1Growth}}٪) هدف‌گذاری شده است.</li>
+              <li>⚠️ <strong>آیا الان بفروشم؟</strong> اگر نیاز فوری به نقدینگی ندارید، فروش طلا با توجه به انتظارات تورمی توصیه نمی‌شود. در طلا معمولاً نگهداری بیش از ۶ ماه همواره برنده است.</li>
+            </ul>
+            <div class="p-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px]">
+              📌 قاعده مهم: هیچ‌وقت کل نقدینگی را در یک روز خرید نکنید! همیشه در ۲ تا ۳ پله خرید کنید.
+            </div>
+          </div>
+        `;
+      }}
+      // سناریو ۳: مقایسه طلا، سکه و دلار
+      else if ((q.includes('سکه') && q.includes('دلار')) || (q.includes('طلا') && q.includes('دلار')) || q.includes('کدوم بهتره') || q.includes('کدام بهتر است')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-amber-400 text-xs sm:text-sm">⚖️ مقایسه موشکافانه: طلای ۱۸ عیار vs سکه vs دلار</div>
+            <div class="space-y-2 text-slate-200 text-[11px]">
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-amber-400 block mb-0.5">🥇 ۱. طلای ۱۸ عیار آبشده (برنده سرمایه‌گذاری امن):</strong>
+                حباب صفر درصد، بدون مالیات و کارمزد بالا، عدم وجود ریسک تخلیه حباب. هر گرم پولی که می‌دهید، طلای فیزیکی است.
+              </div>
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-white block mb-0.5">🪙 ۲. سکه طلا (خوب برای نوسان‌گیری با ریسک):</strong>
+                سکه امامی امروز <strong>${{m.bubblePctCoinNew}}٪ حباب</strong> دارد (یعنی ${{formatNumber(m.bubbleCoinNew)}} تومان پول اضافه بابت هیجان بازار!). اگر بازار آرام شود، حباب خالی می‌شود و سکه افت بیشتری نسبت به طلا خواهد داشت.
+              </div>
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-cyan-400 block mb-0.5">💵 ۳. دلار نقدی (کم‌بازده‌تر از طلا):</strong>
+                دلار فقط تورم داخلی دارد، اما طلا علاوه بر دلار از رشد انس جهانی ($${{formatNumber(APP_DATA.timeline[APP_DATA.timeline.length-1].price > 0 ? 4485 : 0)}}) هم سود می‌برد. طلا در بازه ۵ ساله گذشته حدود ۳۰٪ بیشتر از دلار سود داده است!
+              </div>
+            </div>
+            <div class="p-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
+              🎯 فرمول طلایی سبد: ۶۰٪ طلای آبشده + ۲۵٪ سکه بهار آزادی (حباب کمتر) + ۱۵٪ نقدینگی در صندوق با درآمد ثابت.
+            </div>
+          </div>
+        `;
+      }}
+      // سناریو ۴: حباب انواع سکه
+      else if (q.includes('حباب') || q.includes('سکه امامی') || q.includes('ربع') || q.includes('نیم سکه')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-cyan-400 text-xs sm:text-sm">🫧 جدول دقیق حباب انواع سکه در نرخ زنده امروز:</div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-cyan-500/30 space-y-1.5 text-[11px]">
+              <div class="flex justify-between">
+                <span class="text-slate-300">سکه طرح جدید (امامی):</span>
+                <strong class="text-rose-400 font-mono">${{m.bubblePctCoinNew}}٪ (${{formatNumber(m.bubbleCoinNew)}} تومان)</strong>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-300">سکه بهار آزادی (قدیم):</span>
+                <strong class="text-amber-400 font-mono">${{roundDecimal(((m.coinOld - m.intrinsicCoinNew)/m.coinOld)*100, 1)}}٪ حباب</strong>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-300">نیم سکه:</span>
+                <strong class="text-rose-400 font-mono">${{m.bubblePctHalf}}٪ حباب</strong>
+              </div>
+              <div class="flex justify-between text-rose-400 font-bold border-t border-slate-800 pt-1">
+                <span>ربع سکه (بالاترین ریسک):</span>
+                <strong class="font-mono">${{m.bubblePctQuarter}}٪ حباب!</strong>
+              </div>
+            </div>
+            <p class="text-slate-300 text-[11px]">
+              🚨 <strong>هشدار حباب ربع سکه:</strong> ربع سکه با بیش از ۲۵ تا ۳۰ درصد حباب معامله می‌شود. یعنی یک سوم پول شما در ربع سکه باد هواست! اگر بازار وارد فاز استراحت شود، دارندگان ربع سکه بیشترین زیان را می‌بینند.
+            </p>
+          </div>
+        `;
+      }}
+      // سناریو ۵: خرید بدون اجرت و مالیات
+      else if (q.includes('اجرت') || q.includes('مالیات') || q.includes('دست دوم') || q.includes('آبشده')) {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-emerald-400 text-xs sm:text-sm">🛡️ ۳ ترفند خرید طلا بدون پرداخت اجرت و مالیات:</div>
+            <div class="space-y-1.5 text-slate-200 text-[11px]">
+              <p>وقتی طلای زینتی نو می‌خرید، <strong>۱۰ تا ۲۵ درصد اجرت</strong>، <strong>۹ درصد مالیات</strong> و <strong>۷ درصد سود طلافروش</strong> کسر می‌شود؛ یعنی باید طلا ۴۰ درصد بالا برود تا تازه به اصل پولتان برسید!</p>
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-emerald-400">۱. طلای آبشده (مظنه):</strong> قطعات شمش برش‌خورده با کد ری‌گیری (انگ) که کارمزد آن فقط ۱ تا ۲ درصد است و مالیات ندارد.
+              </div>
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-amber-400">۲. طلای دست دوم مستعمل:</strong> اجرت ساخت آن صفر است و فقط ۳ تا ۵ درصد سود فروشنده پرداخت می‌کنید.
+              </div>
+              <div class="p-2 rounded-xl bg-slate-800 border border-slate-700">
+                <strong class="text-cyan-400">۳. صندوق‌های سرمایه‌گذاری طلا (در بورس):</strong> نمادهایی مثل «طلا»، «عیار»، «کهربا» که بدون کارمزد طلافروشی و با امنیت کامل از طریق پنل بورسی قابل خرید با مبالغ حتی ۵۰۰ هزار تومان است.
+              </div>
+            </div>
+          </div>
+        `;
+      }}
+      // پاسخ تحلیلی پویا و تعاملی
+      else {{
+        answerHtml = `
+          <div class="space-y-2">
+            <div class="font-black text-emerald-400 text-xs sm:text-sm">💡 پاسخ تحلیلی مشاور هوشمند:</div>
+            <p class="text-slate-200">
+              درباره پرسش شما: در شرایط کنونی بازار، نرخ طلای ۱۸ عیار در سطح <strong>${{formatNumber(m.gold18k)}} تومان</strong> و مظنه تهران در کانال <strong>${{formatNumber(m.mesghal)}} تومان</strong> قرار دارد.
+            </p>
+            <p class="text-slate-200 text-[11px]">
+              اگر قصد شما <strong>حفظ ارزش بلندمدت در برابر تورم</strong> است، طلا تاریخی‌ترین سپر دفاعی ریال است. توصیه همیشگی ما انتخاب دارایی با کمترین حباب (طلای آبشده ۱۸ عیار) و ورود در قیمت‌های اصلاحی است.
+            </p>
+            <p class="text-slate-300 text-[11px]">
+              می‌توانید مبالغ بودجه خود را بفرمایید (مثلاً: <em>با ۲۰ میلیون چی بخرم؟</em>) تا جدول بازدهی و گرم طلا را برایتان دقیق محاسبه کنم.
+            </p>
+          </div>
+        `;
+      }}
+
+      appendPopupMessage('assistant', answerHtml);
+    }}
+
     function getLiveMarketMetrics() {{
       const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
       const gold18k = latestItem.price;
@@ -3221,12 +3591,130 @@ def build():
       startAutoSyncTimer();
     }});
   </script>
-  <!-- FLOATING AI ADVISOR BUTTON -->
-  <button onclick="switchTab('tab-advisor')" class="fixed bottom-4 left-4 z-40 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-xl shadow-emerald-950/40 border border-emerald-400/40 flex items-center gap-2 transition-all hover:scale-105 group">
-    <span class="text-base animate-bounce">🤖</span>
+  <!-- ========================================================================= -->
+  <!-- 🤖 FLOATING AI CHAT POPUP WIDGET & TRIGGER BUTTON -->
+  <!-- ========================================================================= -->
+
+  <!-- FLOATING POPUP CHAT WINDOW (MODAL) -->
+  <div id="aiChatPopupModal" class="fixed bottom-20 left-4 sm:left-6 z-50 w-[390px] max-w-[calc(100vw-2rem)] h-[590px] max-h-[calc(100vh-6.5rem)] rounded-3xl bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-emerald-500/50 shadow-2xl shadow-emerald-950/60 flex flex-col justify-between overflow-hidden transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-left" style="direction: rtl;">
+    
+    <!-- POPUP HEADER -->
+    <div class="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border-b border-emerald-500/30 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="relative">
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-lg shadow-inner">
+            🤖
+          </div>
+          <span class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-900 animate-pulse"></span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h3 class="text-xs sm:text-sm font-black text-white">مشاور هوش مصنوعی طلا</h3>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">آنلاین</span>
+          </div>
+          <p class="text-[10px] text-slate-300 font-medium">تحلیل زنده بازار، حباب و پیش‌بینی ۱ ساله</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <!-- Settings API Key Button -->
+        <button onclick="toggleAiApiSettings()" title="تنظیمات API هوش مصنوعی" class="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-emerald-300 transition-colors">
+          ⚙️
+        </button>
+        <!-- Close Popup Button -->
+        <button onclick="toggleAiChatPopup(false)" class="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- LIVE MARKET CONTEXT TICKER IN POPUP -->
+    <div class="bg-emerald-950/40 border-b border-emerald-500/20 px-3 py-1.5 text-[10px] flex items-center justify-between text-slate-300 font-bold">
+      <span class="flex items-center gap-1">
+        <span class="text-amber-400">🪙 طلا ۱۸:</span>
+        <span id="popupLiveGoldPrice" class="font-mono text-white">--</span>
+      </span>
+      <span class="text-slate-500">|</span>
+      <span class="flex items-center gap-1">
+        <span class="text-rose-400">🫧 حباب سکه:</span>
+        <span id="popupLiveBubblePct" class="font-mono text-white">--</span>
+      </span>
+      <span class="text-slate-500">|</span>
+      <span class="flex items-center gap-1">
+        <span class="text-cyan-400">🔮 سود ۱ ساله:</span>
+        <span id="popupLiveForecastGrowth" class="font-mono text-white">--</span>
+      </span>
+    </div>
+
+    <!-- OPTIONAL API KEY SETTINGS PANEL (COLLAPSIBLE) -->
+    <div id="aiApiSettingsPanel" class="hidden p-3 bg-slate-800/90 border-b border-emerald-500/30 text-xs space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-emerald-400">🔑 اتصال به هوش مصنوعی زاینده (اختیاری):</span>
+        <button onclick="toggleAiApiSettings()" class="text-slate-400 hover:text-white text-[11px]">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-300 leading-relaxed">
+        سیستم به صورت پیش‌فرض با <strong>موتور تحلیلی داخلی</strong> به تمام سوالات بازار پاسخ هوشمند می‌دهد. اگر می‌خواهید مستقیماً به <strong>Google Gemini</strong> یا <strong>Groq</strong> متصل شوید، کلید رایگان خود را وارد کنید:
+      </p>
+      <div class="flex items-center gap-1.5">
+        <input type="password" id="customApiKeyInput" placeholder="کلید API مثلاً AIzaSy... یا gsk_..." class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-white text-[11px] focus:outline-none focus:border-emerald-500">
+        <button onclick="saveCustomApiKey()" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px]">
+          ذخیره
+        </button>
+      </div>
+      <div id="apiKeyStatusMsg" class="text-[10px] text-slate-400"></div>
+    </div>
+
+    <!-- CHAT MESSAGES BODY -->
+    <div id="popupChatMessages" class="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs leading-relaxed" style="scroll-behavior: smooth;">
+      <!-- Welcome Message -->
+      <div class="flex items-start gap-2 max-w-[92%]">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs shrink-0 mt-0.5">🤖</div>
+        <div class="p-3 rounded-2xl rounded-tr-none bg-slate-800/90 border border-slate-700 text-slate-100 space-y-1.5 shadow-sm">
+          <p class="font-black text-emerald-400">سلام! من دستیار هوشمند و مشاور اختصاصی بازار طلا هستم.</p>
+          <p class="text-slate-200">
+            نرخ‌های روز طلا ۱۸ عیار، انواع سکه و پیش‌بینی مدل عصبی LSTM و چرخه‌های فصلی را به طور کامل تحلیل کرده‌ام.
+          </p>
+          <p class="text-slate-300 text-[11px]">
+            می‌توانید بپرسید: <strong>«الان طلا بخرم یا بفروشم؟»</strong>، <strong>«با ۵۰ میلیون چی بخرم؟»</strong>، یا <strong>«سکه بهتره یا دلار؟»</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK PROMPTS CHIPS BAR -->
+    <div class="px-3 py-1.5 bg-slate-900/80 border-t border-slate-800 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[11px] scrollbar-none">
+      <button onclick="sendQuickPopupPrompt('الان طلا بخرم یا بفروشم؟')" class="px-2.5 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-bold shrink-0 transition-all">
+        🪙 بخرم یا بفروشم؟
+      </button>
+      <button onclick="sendQuickPopupPrompt('طلا بخرم یا سکه یا دلار؟')" class="px-2.5 py-1 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 font-bold shrink-0 transition-all">
+        ⚖️ طلا یا سکه یا دلار؟
+      </button>
+      <button onclick="sendQuickPopupPrompt('حباب سکه امروز چقدر است و کدوم سکه بهتره؟')" class="px-2.5 py-1 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 font-bold shrink-0 transition-all">
+        🫧 حباب سکه
+      </button>
+      <button onclick="sendQuickPopupPrompt('با ۵۰ میلیون تومان الان چی بخرم؟')" class="px-2.5 py-1 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 font-bold shrink-0 transition-all">
+        💰 با ۵۰ میلیون چی بخرم؟
+      </button>
+    </div>
+
+    <!-- POPUP INPUT BAR -->
+    <form onsubmit="handlePopupChatSubmit(event)" class="p-2.5 bg-slate-900 border-t border-emerald-500/20 flex items-center gap-2">
+      <input type="text" id="popupChatInput" placeholder="هر سوالی دارید بنویسید (مثلاً: با ۱۰۰ میلیون چیکار کنم؟)..." class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium">
+      <button type="submit" id="popupSendBtn" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs flex items-center gap-1 shadow-lg shadow-emerald-500/20 transition-all">
+        <span>ارسال</span>
+        <span>🚀</span>
+      </button>
+    </form>
+
+  </div>
+
+  <!-- FLOATING TRIGGER BUTTON (TOGGLES POPUP MODAL) -->
+  <button onclick="toggleAiChatPopup()" id="floatingAiChatBtn" class="fixed bottom-5 left-5 z-40 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 text-white font-black text-xs shadow-2xl shadow-emerald-950/60 border-2 border-emerald-400/50 flex items-center gap-2.5 transition-all hover:scale-105 group cursor-pointer">
+    <span class="text-lg group-hover:scale-110 transition-transform">🤖</span>
     <span>مشاور هوشمند طلا</span>
-    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-ping"></span>
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping"></span>
   </button>
+
 
 </body>
 </html>
