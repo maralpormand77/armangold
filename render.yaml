@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: gold-iran-dashboard
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000

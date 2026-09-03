@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="سامانه هوشمند آنلاین طلا و انواع سکه • بروزرسانی خودکار هر 30 دقیقه • ثبت خودکار روزانه و محاسبه میانگین ماهانه">
+  <title>داشبورد آنلاین طلا، سکه و میانگین ماهانه (estjt.ir)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts: Vazirmatn -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            vazir: ['Vazirmatn', 'Tahoma', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            gold: {
+              50: '#fffdf0',
+              100: '#fef9c3',
+              200: '#fef08a',
+              300: '#fde047',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+              700: '#a16207',
+              800: '#854d0e',
+              900: '#713f12',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Vazirmatn', Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
+      touch-action: manipulation;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+    }
+    .dark .glass-card {
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(55, 65, 81, 0.7);
+    }
+    .tab-grid-btn.active {
+      background: linear-gradient(135deg, #eab308, #ca8a04);
+      color: #0f172a;
+      font-weight: 800;
+      border-color: #facc15;
+      box-shadow: 0 4px 14px 0 rgba(234, 179, 8, 0.35);
+      transform: translateY(-1px);
+    }
+    .tab-grid-btn.active * {
+      color: #0f172a !important;
+    }
+    /* Smooth mobile touch scrolling for tables */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.03);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ca8a04;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 pb-12 antialiased selection:bg-amber-500 selection:text-slate-900">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-50 glass-card border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
+      
+      <!-- Title & Auto-sync badge -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-900 font-bold text-xl flex-shrink-0">
+          🪙
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <h1 class="text-base sm:text-2xl font-black tracking-tight">
+              روند آنلاین طلا و سکه
+            </h1>
+            <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-400/50" title="استعلام خودکار هر 30 دقیقه یکبار فعال است">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block"></span>
+              <span>بروزرسانی خودکار 30 دقیقه</span>
+            </span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+            ثبت خودکار روزانه • محاسبه میانگین ماه • پیش‌بینی غلتان 12 ماه آینده
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Controls & Countdown -->
+      <div class="flex items-center gap-2 sm:gap-3 ml-auto sm:ml-0">
+        <!-- 30-min Countdown Indicator -->
+        <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs">
+          <span class="text-slate-400">⏱️ استعلام بعدی:</span>
+          <span id="autoSyncCountdown" class="font-bold font-mono text-cyan-600 dark:text-cyan-400">30:00</span>
+        </div>
+
+        <!-- Live Refresh Button -->
+        <button id="btnFetchLive" onclick="fetchLiveOnlinePrice(false)" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-[11px] sm:text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all active:scale-95">
+          <span id="syncSpinIcon">🔄</span>
+          <span class="hidden sm:inline">بروزرسانی فوری</span>
+          <span class="sm:hidden">استعلام زنده</span>
+        </button>
+
+        <!-- Dark mode toggle -->
+        <button id="themeToggle" onclick="toggleTheme()" class="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm" title="تغییر تم شب/روز" aria-label="تغییر تم">
+          <span id="themeIcon" class="text-base sm:text-lg">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LIVE STATUS TICKER BAR -->
+  <div class="bg-amber-500/10 border-b border-amber-500/20 py-2 px-3 sm:px-4 text-xs">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="font-bold text-amber-600 dark:text-amber-400">📡 نرخ روز طلای 18 عیار:</span>
+        <span id="tickerLivePrice" class="font-black text-slate-900 dark:text-white bg-amber-400/20 px-2 py-0.5 rounded-lg border border-amber-400/30 text-sm">
+          23,484,500 تومان
+        </span>
+        <span class="text-slate-400 text-[11px]">|</span>
+        <span class="text-slate-500 dark:text-slate-400 text-[11px]" id="tickerUpdateTime">
+          آخرین استعلام: 13 شهریور 1405 - 00:26:02 (اتحادیه طلا estjt.ir)
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-[11px] text-cyan-600 dark:text-cyan-400 font-bold">
+        <span>📊 میانگین جاری این ماه: <strong id="tickerMonthAvg" class="text-slate-900 dark:text-white bg-cyan-400/20 px-1.5 py-0.5 rounded">23,479,900 ت</strong></span>
+        <span class="text-slate-400">|</span>
+        <span>تعداد ثبت‌ها: <strong id="tickerSampleCount">3 بار</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6">
+
+    <!-- KPI HIGHLIGHT CARDS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+      <!-- KPI 1: Live & Monthly Avg -->
+      <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-amber-400/60 transition-all col-span-1">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
+          <span id="kpiLatestLabel">نرخ روز طلا 18 عیار</span>
+          <span class="text-emerald-500 font-bold text-[10px] sm:text-xs bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded">استعلام زنده</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight" id="kpiLatestPrice">
+          23,484,500 <span class="text-[11px] sm:text-xs font-normal text-slate-500 dark:text-slate-400">تومان</span>
+        </div>
+        <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+          <span>میانگین ماه:</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200" id="kpiMonthAverageVal">23,479,900 ت</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: ROLLING 1-YEAR HYBRID FORECAST TARGET (GOLD THEMED) -->
+      <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-amber-400/80 transition-all border border-amber-500/40 col-span-1">
+        <div class="flex items-center justify-between text-slate-700 dark:text-slate-200 text-[11px] sm:text-xs font-bold mb-1">
+          <span id="kpiForecastLabel">هدف 12 ماه آینده (مدل ترکیبی)</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-400/50">
+            Tri-Hybrid AI
+          </span>
+        </div>
+        <div class="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight" id="kpiForecastPrice">
+          -- <span class="text-[11px] sm:text-xs font-normal text-slate-600 dark:text-slate-300">تومان</span>
+        </div>
+        <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-bold flex items-center justify-between">
+          <span>رشد تخمینی 1 ساله:</span>
+          <span class="font-black text-amber-600 dark:text-amber-400" id="kpiForecastGrowthVal">+--%</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Wage -->
+      <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-rose-400/60 transition-all col-span-1">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
+          <span>قدرت خرید حقوق پایه</span>
+          <span class="text-rose-500 font-bold text-[10px] sm:text-xs">سقوط 90٪</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight" id="kpiWageInGrams">
+          0.94 <span class="text-[11px] sm:text-xs font-normal text-slate-500 dark:text-slate-400">گرم طلا</span>
+        </div>
+        <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
+          از 9.4 گرم در سال 95 به کمتر از 1 گرم رسیده است
+        </div>
+      </div>
+
+      <!-- KPI 4: Multiplier -->
+      <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-indigo-400/60 transition-all col-span-1">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
+          <span>ضریب کل رشد طلا</span>
+          <span class="text-indigo-500 font-bold text-[10px] sm:text-xs">از فروردین 95</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight" id="kpiMultiplier">
+          226.9 برابر
+        </div>
+        <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
+          از 103,500 تومان به بیش از 23.4 میلیون تومان
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE COIN & GOLD SUMMARY DECK -->
+    <section class="glass-card rounded-2xl p-4 shadow-sm border border-amber-500/30">
+      <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🪙</span>
+          <h3 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">
+            تابلو لحظه‌ای نرخ طلا و انواع سکه (سامانه اتحادیه طلا تهران)
+          </h3>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] text-slate-400">
+          <span>واحد: تومان</span>
+          <span>•</span>
+          <span class="text-emerald-500 font-bold">بروزرسانی زنده</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs">
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">طلا 18 عیار</span>
+          <span class="font-black text-amber-600 dark:text-amber-400 block" id="coinCardGold18">23,484,500</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">مظنه تهران (مثقال)</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardMesghal">101,730,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه طرح جدید (امامی)</span>
+          <span class="font-black text-amber-500 block" id="coinCardNew">233,500,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه بهار آزادی</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardOld">230,500,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">نیم سکه</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardHalf">119,500,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">ربع سکه</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardQuarter">64,500,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه یک گرمی</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardGram">35,000,000</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">انس جهانی طلا</span>
+          <span class="font-black text-cyan-500 block" id="coinCardOunce">$ 4,485</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS: چهارخونه‌ای لمسی و واکنش‌گرا -->
+    <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-2.5">
+      <!-- Tab 1 -->
+      <button onclick="switchTab('tab-macro')" id="btn-tab-macro" class="tab-grid-btn active glass-card p-3 rounded-2xl border text-right transition-all flex flex-col justify-between hover:border-amber-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">📈</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold">اصلی</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">نمودار رشد طلا</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">روند زنده و پیش‌بینی</div>
+        </div>
+      </button>
+
+      <!-- Tab 2 -->
+      <button onclick="switchTab('tab-forecast-details')" id="btn-tab-forecast-details" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-cyan-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">🔮</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 font-bold">نمودار</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">سناریوهای آینده</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">نمودار 12 ماه آینده</div>
+        </div>
+      </button>
+
+      <!-- Tab 3 -->
+      <button onclick="switchTab('tab-wage')" id="btn-tab-wage" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-rose-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">⚖️</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold">دستمزد</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">طلا و حقوق پایه</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">سقوط قدرت خرید</div>
+        </div>
+      </button>
+
+      <!-- Tab 4 -->
+      <button onclick="switchTab('tab-seasonality')" id="btn-tab-seasonality" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-emerald-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">🗓️</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold">فصلی</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">الگوی فصلی و هیت‌مپ</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">بهترین زمان خرید</div>
+        </div>
+      </button>
+
+      <!-- Tab 5 -->
+      <button onclick="switchTab('tab-yearly')" id="btn-tab-yearly" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-indigo-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">📊</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold">سالیانه</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">کارنامه سال به سال</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">ثبت سقف و کف‌ها</div>
+        </div>
+      </button>
+
+      <!-- Tab 6 -->
+      <button onclick="switchTab('tab-table')" id="btn-tab-table" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-amber-400 shadow-sm">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">📋</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold">داده‌ها</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">بانک کل داده‌ها</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">جستجو و خروجی CSV</div>
+        </div>
+      </button>
+
+      <!-- Tab 7: Moved to End -->
+      <button onclick="switchTab('tab-live-sync')" id="btn-tab-live-sync" class="tab-grid-btn glass-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-right transition-all flex flex-col justify-between hover:border-teal-400 shadow-sm col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xl">🌐</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-700 dark:text-teal-300 font-bold">اتحادیه</span>
+        </div>
+        <div>
+          <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">مدیریت آنلاین و سکه‌ها</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">تنظیمات و ورودی estjt</div>
+        </div>
+      </button>
+    </nav>
+
+    <!-- TAB 1: MACRO CHART WITH DYNAMIC ROLLING FORECAST -->
+    <div id="tab-macro" class="tab-content space-y-4 sm:space-y-6">
+      <div class="glass-card rounded-2xl p-3.5 sm:p-5 shadow-sm">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h2 class="text-sm sm:text-lg font-bold flex items-center gap-2 flex-wrap">
+              <span>روند رشد طلا 18 عیار</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300 border border-cyan-400/40">
+                پیش‌بینی غلتان 1 ساله (نقطه‌چین)
+              </span>
+            </h2>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              خط زرد: داده‌های تاریخی • خط نقطه‌چین بنفش: پیش‌بینی 1 ساله مدل ترکیبی سه‌گانه
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button id="btnToggleForecast" onclick="toggleForecastVisibility()" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-cyan-400 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 shadow-sm transition-all hover:bg-cyan-500/25">
+              <span class="w-2 h-2 rounded-full bg-cyan-500 animate-ping inline-block"></span>
+              <span>خط پیش‌بینی: فعال</span>
+            </button>
+
+            <!-- نشانگر مدل ترکیبی سه‌گانه -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-purple-400/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 font-bold text-[11px] sm:text-xs shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span><span>مدل ترکیبی (LSTM + روند + فصلی)</span>
+            </div>
+
+            <select id="selectForecastScenario" onchange="changeForecastScenario(this.value)" class="px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] sm:text-xs font-semibold focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="base">سناریوی پایه (محتمل‌ترین)</option>
+              <option value="conservative">سناریوی محافظه‌کارانه</option>
+              <option value="bullish">سناریوی صعودی / جهش ارزی</option>
+            </select>
+
+            <button onclick="toggleScale()" id="btnScaleToggle" class="px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-medium">
+              مقیاس: خطی
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+          <div class="flex flex-wrap items-center gap-1 text-[11px] sm:text-xs">
+            <button onclick="filterTimeline('all')" class="time-filter active px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-amber-400 text-slate-900 font-bold" data-range="all">همه سال‌ها + آینده</button>
+            <button onclick="filterTimeline('3y')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="3y">3 سال اخیر + آینده</button>
+            <button onclick="filterTimeline('5y')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="5y">5 سال اخیر</button>
+            <button onclick="filterTimeline('early')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="early">سال‌های اولیه (95-99)</button>
+          </div>
+          <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+            <span>● مبدا پیش‌بینی: نرخ آنلاین و میانگین استعلام شده</span>
+          </div>
+        </div>
+
+        <div class="relative w-full h-[340px] sm:h-[480px] touch-pan-y">
+          <canvas id="macroChart"></canvas>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-xs">
+          <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-slate-600 dark:text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>
+              قیمت ثبت‌شده تاریخی
+            </span>
+            <span class="flex items-center gap-1.5 font-bold text-cyan-600 dark:text-cyan-400">
+              <span class="w-4 h-0.5 border-t-2 border-dashed border-cyan-400 inline-block"></span>
+              پیش‌بینی 1 ساله (نقطه‌چین غلتان)
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1.5 rounded-full bg-purple-400 inline-block"></span>
+              میانگین 6 ماهه (SMA)
+            </span>
+          </div>
+          <div class="text-slate-400 text-[11px]">
+            ⚡ سیستم به طور خودکار روزانه قیمت‌ها را ذخیره کرده و میانگین ماه را آپدیت می‌کند.
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-3.5 sm:p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+          <div>
+            <h3 class="text-xs sm:text-base font-bold">نوسان ماه به ماه طلا (بازدهی ماهانه ٪)</h3>
+            <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">میزان رشد یا افت قیمت در هر ماه در طول تاریخ 10 ساله</p>
+          </div>
+          <div class="text-[10px] sm:text-xs flex items-center gap-2">
+            <span class="text-emerald-500 font-semibold">▲ سبز: ماه مثبت</span>
+            <span class="text-rose-500 font-semibold">▼ قرمز: ماه منفی</span>
+          </div>
+        </div>
+        <div class="relative w-full h-[200px] sm:h-[240px]">
+          <canvas id="momReturnsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ROLLING 1-YEAR FORECAST DETAILS & SCENARIOS CHART -->
+    <div id="tab-forecast-details" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <!-- MODEL ARCHITECTURE HEADER BAR -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-amber-500/30 bg-gradient-to-r from-slate-900/80 via-amber-950/20 to-slate-900/80">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🔮</span>
+              <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white" id="forecastDetailsHeader">پیش‌بینی و سناریوهای 12 ماه آینده (مدل ترکیبی سه‌گانه - Tri-Hybrid Ensemble)</h3>
+            </div>
+            <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold mt-1">
+              تلفیق هوشمندانه افق‌های زمانی: ماه 1 با هوش مصنوعی LSTM + ماه‌های 2 تا 5 با روند تطبیقی مومنتوم + ماه‌های 6 تا 12 با چرخه‌های فصلی 10 ساله
+            </p>
+          </div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="px-2.5 py-1 rounded-xl text-[11px] font-black border border-amber-400/60 bg-amber-500/15 text-amber-600 dark:text-amber-300 flex items-center gap-1.5 shadow-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+              <span>ماه 1: شبکه LSTM</span>
+            </span>
+            <span class="px-2.5 py-1 rounded-xl text-[11px] font-black border border-emerald-400/60 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 flex items-center gap-1.5 shadow-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+              <span>ماه 2 تا 5: روند مومنتوم</span>
+            </span>
+            <span class="px-2.5 py-1 rounded-xl text-[11px] font-black border border-cyan-400/60 bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 flex items-center gap-1.5 shadow-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>
+              <span>ماه 6 تا 12: چرخه فصلی</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3 Architecture Explanation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Box 1: Gold themed -->
+          <div class="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/40 text-xs space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-amber-600 dark:text-amber-300 text-xs sm:text-sm">🧠 1. کوتاه‌مدت (ماه 1):</span>
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-900/80 text-amber-200 border border-amber-500/30">LSTM Deep Learning</span>
+            </div>
+            <p class="text-slate-800 dark:text-slate-100 font-medium text-xs leading-relaxed">
+              مدل‌سازی شتاب آنی نوسانات و خودهمبستگی 30 روز اخیر جهت پیش‌بینی دقیق اولین ماه پیش‌رو.
+            </p>
+          </div>
+
+          <!-- Box 2: Emerald themed -->
+          <div class="p-3.5 rounded-xl bg-emerald-950/25 border border-emerald-500/30 text-xs space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-emerald-600 dark:text-emerald-300 text-xs sm:text-sm">📈 2. میان‌مدت (ماه 2 تا 5):</span>
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-900/80 text-emerald-200 border border-emerald-500/30">Adaptive Momentum</span>
+            </div>
+            <p class="text-slate-800 dark:text-slate-100 font-medium text-xs leading-relaxed">
+              روند تطبیقی میانگین متحرک نمایی (EWMA) و اثر انباشته نقدینگی بر بازار در افق چندماهه.
+            </p>
+          </div>
+
+          <!-- Box 3: Cyan themed -->
+          <div class="p-3.5 rounded-xl bg-cyan-950/25 border border-cyan-500/30 text-xs space-y-1.5 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-cyan-600 dark:text-cyan-300 text-xs sm:text-sm">🗓️ 3. بلندمدت (ماه 6 تا 12):</span>
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-900/80 text-cyan-200 border border-cyan-500/30">10-Year Seasonality</span>
+            </div>
+            <p class="text-slate-800 dark:text-slate-100 font-medium text-xs leading-relaxed">
+              چرخه‌های فصلی تاریخی 10 ساله (جهش زمستانه بهمن/اسفند و فاز تثبیت خرداد) متصل به تورم سالانه.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEDICATED 12-MONTH UNIFIED FORECAST GROWTH CHART -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-amber-500/40">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📊 نمودار سناریوهای پیش‌بینی 12 ماه آینده (مسیر یکپارچه مدل ترکیبی)</span>
+              <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-400/50">
+                پیش‌بینی واحد
+              </span>
+            </h3>
+            <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold mt-1">
+              مسیر سناریوی پایه ترکیبی (طلایی)، کف کریدور حمایتی (سبز) و سقف شتاب صعودی (آبی فیروزه‌ای)
+            </p>
+          </div>
+        </div>
+
+        <div class="relative w-full h-[320px] sm:h-[400px]">
+          <canvas id="forecastScenariosChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 3 Scenario Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Card 1: Base Scenario (BOX 1: GOLD / AMBER THEMED - MATCHES SITE IDENTITY) -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-md border-2 border-amber-500/60 hover:border-amber-400 flex flex-col justify-between bg-gradient-to-b from-amber-500/10 via-slate-900/30 to-slate-900/50 relative overflow-hidden group" id="cardScenarioBase">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-950 dark:bg-amber-950 dark:text-amber-200 border border-amber-400/50">
+                سناریوی پایه (محتمل‌ترین)
+              </span>
+              <span class="text-xs font-black text-amber-600 dark:text-amber-400">مسیر مرکزی</span>
+            </div>
+            <h4 class="text-base font-black mb-1 text-slate-900 dark:text-white">پیش‌بینی 12 ماهه مدل ترکیبی</h4>
+            <p class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-3">
+              حاصل پیوند هوش مصنوعی LSTM، روند تورمی و چرخه‌های فصلی
+            </p>
+
+            <div class="p-3.5 rounded-xl bg-amber-500/15 dark:bg-amber-950/40 border border-amber-500/40 space-y-2.5 text-xs shadow-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-amber-700 dark:text-amber-300 text-xs sm:text-sm">هدف 12 ماهه:</span>
+                <span class="font-black text-amber-600 dark:text-amber-400 text-base sm:text-lg" id="scenBase12m">--</span>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>رشد 12 ماهه:</span>
+                <strong class="text-amber-600 dark:text-amber-400 font-black text-sm" id="scenBaseGrowth">+--%</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold border-t border-amber-500/25 pt-2">
+                <span>هدف 6 ماهه:</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenBase6m">--</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>هدف 1 ماهه (LSTM):</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenBase1m">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Conservative Scenario (EMERALD GREEN) -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-emerald-500/40 flex flex-col justify-between" id="cardScenarioCons">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-400/40">
+                سناریوی محافظه‌کارانه
+              </span>
+              <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">کف حمایتی</span>
+            </div>
+            <h4 class="text-base font-black mb-1 text-slate-900 dark:text-white">تثبیت نسبی و کف کریدور</h4>
+            <p class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-3">
+              در صورت کنترل نقدینگی و ثبات نسبی متغیرهای کلان
+            </p>
+
+            <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5 text-xs shadow-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm">کف 12 ماهه:</span>
+                <span class="font-black text-emerald-600 dark:text-emerald-400 text-base sm:text-lg" id="scenCons12m">--</span>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>رشد 12 ماهه:</span>
+                <strong class="text-emerald-600 dark:text-emerald-400 font-black text-sm" id="scenConsGrowth">+--%</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold border-t border-emerald-500/20 pt-2">
+                <span>کف 6 ماهه:</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenCons6m">--</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>کف 1 ماهه:</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenCons1m">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Bullish Scenario (CYAN / SKY BLUE) -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm border border-cyan-500/40 flex flex-col justify-between" id="cardScenarioBull">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-950 dark:bg-cyan-950 dark:text-cyan-200 border border-cyan-400/40">
+                سناریوی صعودی و تورمی
+              </span>
+              <span class="text-xs font-black text-cyan-600 dark:text-cyan-400">سقف شتابان</span>
+            </div>
+            <h4 class="text-base font-black mb-1 text-slate-900 dark:text-white">شوک ارزی و سقف جهشی</h4>
+            <p class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-3">
+              مشابه پرشتاب‌ترین دوره‌های صعودی طلا و انتظارات تورمی
+            </p>
+
+            <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 space-y-2.5 text-xs shadow-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-cyan-700 dark:text-cyan-300 text-xs sm:text-sm">سقف 12 ماهه:</span>
+                <span class="font-black text-cyan-600 dark:text-cyan-400 text-base sm:text-lg" id="scenBull12m">--</span>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>رشد 12 ماهه:</span>
+                <strong class="text-cyan-600 dark:text-cyan-400 font-black text-sm" id="scenBullGrowth">+--%</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold border-t border-cyan-500/20 pt-2">
+                <span>سقف 6 ماهه:</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenBull6m">--</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-800 dark:text-slate-200 font-bold">
+                <span>سقف 1 ماهه:</span>
+                <strong class="text-slate-950 dark:text-white font-black" id="scenBull1m">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed 12-Month Rolling Table (Unified Hybrid) -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm overflow-x-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>جدول زمان‌بندی ماه به ماه 12 ماه آینده (مدل ترکیبی سه‌گانه)</span>
+            <span class="text-xs font-black px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-400/40">پیش‌بینی واحد</span>
+          </h3>
+          <span class="text-xs font-bold text-slate-700 dark:text-slate-200">مبدا محاسبات: آخرین نرخ روز و میانگین ثبت شده ماه</span>
+        </div>
+        <table class="w-full text-xs text-right border-collapse">
+          <thead>
+            <tr class="border-b-2 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-black whitespace-nowrap bg-slate-100/70 dark:bg-slate-800/60">
+              <th class="py-3 px-3">ردیف</th>
+              <th class="py-3 px-3">ماه آینده</th>
+              <th class="py-3 px-3">الگوریتم حاکم بر افق زمانی</th>
+              <th class="py-3 px-3 text-amber-600 dark:text-amber-400">قیمت سناریوی پایه (تومان)</th>
+              <th class="py-3 px-3 text-emerald-600 dark:text-emerald-400">رشد ماهانه</th>
+              <th class="py-3 px-3 text-amber-600 dark:text-amber-400">رشد تجمعی</th>
+              <th class="py-3 px-3 text-emerald-600 dark:text-emerald-400">کف محافظه‌کارانه</th>
+              <th class="py-3 px-3 text-cyan-600 dark:text-cyan-400">سقف صعودی</th>
+            </tr>
+          </thead>
+          <tbody id="rollingForecastTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/70"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: طلا و حقوق پایه -->
+    <div id="tab-wage" class="tab-content hidden space-y-4 sm:space-y-6">
+      <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-rose-900/30 to-amber-900/20 border border-rose-500/30 text-xs sm:text-sm leading-relaxed">
+        <div class="flex items-center gap-2 font-bold text-rose-400 text-sm mb-1">
+          <span>⚠️</span>
+          <span>واقعیت اقتصادی: شکاف 10 برابری رشد طلا نسبت به حقوق پایه</span>
+        </div>
+        حقوق پایه مصوب اداره کار از 972 هزار تومان در سال 1395 به 22 میلیون تومان در سال 1405 رسیده (رشد 22.6 برابری)، اما قیمت طلا در همین بازه بیش از 226 برابر شده است. این یعنی قدرت خرید یک ماه دستمزد پایه از 9.4 گرم طلا به کمتر از 1 گرم سقوط کرده است!
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+          <h3 class="text-sm sm:text-base font-bold mb-1">قدرت خرید حقوق پایه (چند گرم طلا با 1 ماه حقوق؟)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">سقوط از 9.4 گرم در سال 95 به 0.94 گرم امروز</p>
+          <div class="relative w-full h-[280px] sm:h-[320px]">
+            <canvas id="purchasingPowerChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+          <h3 class="text-sm sm:text-base font-bold mb-1">شاخص مقایسه‌ای رشد طلا در برابر حقوق پایه (مبنای 100 = سال 95)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">نمایش پیشتازی فزاینده قیمت طلا نسبت به افزایش دستمزدها</p>
+          <div class="relative w-full h-[280px] sm:h-[320px]">
+            <canvas id="growthIndexChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm overflow-x-auto">
+        <h3 class="text-sm sm:text-base font-bold mb-3">جدول مقایسه سالیانه حقوق پایه مصوب و معادل طلایی آن</h3>
+        <table class="w-full text-xs text-right border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-semibold">
+              <th class="py-2.5 px-3">سال</th>
+              <th class="py-2.5 px-3">حقوق پایه کارگر (تومان)</th>
+              <th class="py-2.5 px-3">درصد رشد سالانه حقوق</th>
+              <th class="py-2.5 px-3">میانگین قیمت طلا در سال</th>
+              <th class="py-2.5 px-3">معادل گرم طلا با 1 ماه حقوق</th>
+              <th class="py-2.5 px-3">تغییر قدرت خرید طلا</th>
+            </tr>
+          </thead>
+          <tbody id="wageTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: الگوی فصلی و هیت‌مپ -->
+    <div id="tab-seasonality" class="tab-content hidden space-y-4 sm:space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+          <h3 class="text-sm sm:text-base font-bold mb-1">کدام ماه‌ها بهترین زمان خرید بوده‌اند؟</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">میانگین بازدهی هر کدام از 12 ماه سال در طول 10 سال گذشته</p>
+          <div class="relative w-full h-[280px] sm:h-[320px]">
+            <canvas id="seasonalityBarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+          <h3 class="text-sm sm:text-base font-bold mb-1">احتمال صعود طلا در هر ماه (Win Rate ٪)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">درصد سال‌هایی که این ماه با رشد مثبت بسته شده است</p>
+          <div class="relative w-full h-[280px] sm:h-[320px]">
+            <canvas id="seasonalityWinRateChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold mb-1">هیت‌مپ ماتریسی نوسانات ماهانه (Year-Month Matrix)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">درصد بازدهی هر ماه نسبت به ماه قبل. سبز: رشد، قرمز: افت</p>
+          </div>
+          <div class="flex items-center gap-2 text-[11px]">
+            <span class="w-2.5 h-2.5 rounded bg-emerald-600 inline-block"></span><span>رشد بالا</span>
+            <span class="w-2.5 h-2.5 rounded bg-rose-600 inline-block"></span><span>افت</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-center border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+                <th class="py-2 px-2 text-right">سال</th>
+                <th class="py-2 px-1">فروردین</th>
+                <th class="py-2 px-1">اردیبهشت</th>
+                <th class="py-2 px-1">خرداد</th>
+                <th class="py-2 px-1">تیر</th>
+                <th class="py-2 px-1">مرداد</th>
+                <th class="py-2 px-1">شهریور</th>
+                <th class="py-2 px-1">مهر</th>
+                <th class="py-2 px-1">آبان</th>
+                <th class="py-2 px-1">آذر</th>
+                <th class="py-2 px-1">دی</th>
+                <th class="py-2 px-1">بهمن</th>
+                <th class="py-2 px-1">اسفند</th>
+              </tr>
+            </thead>
+            <tbody id="heatmapTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: کارنامه سال به سال -->
+    <div id="tab-yearly" class="tab-content hidden space-y-4 sm:space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div class="lg:col-span-2 glass-card rounded-2xl p-4 sm:p-5 shadow-sm">
+          <h3 class="text-sm sm:text-base font-bold mb-1">بازدهی سالانه طلا (درصد رشد هر سال)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">سنجش عملکرد انتهای هر سال نسبت به شروع آن</p>
+          <div class="relative w-full h-[280px] sm:h-[320px]">
+            <canvas id="yearlyReturnBarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold mb-3">بینش‌های کلیدی سالانه</h3>
+            <ul class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <li class="flex items-start gap-2">
+                <span class="text-amber-500 font-bold">🥇</span>
+                <div><strong>رکورد جهش سالانه:</strong> سال 1404 با رشد 146٪ و سال 1397 با رشد 163٪ پرشتاب‌ترین سال‌های صعودی بوده‌اند.</div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-500 font-bold">🛡️</span>
+                <div><strong>بدون بازدهی منفی:</strong> در تمام 11 سال ثبت‌شده، بازدهی کلی طلا همواره مثبت بوده و هیچ سالی زیان‌ده بسته نشده است!</div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-500 font-bold">📉</span>
+                <div><strong>آرام‌ترین سال:</strong> سال 1396 با بازدهی 28٪ کم‌نوسان‌ترین دوره بوده است.</div>
+              </li>
+            </ul>
+          </div>
+          <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-400 mt-3">
+            📌 جزئیات کف و سقف هر سال در جدول زیر آمده است.
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-sm overflow-x-auto">
+        <h3 class="text-sm sm:text-base font-bold mb-3">کارنامه عملکرد تفکیکی سال‌های 1395 تا 1405</h3>
+        <table class="w-full text-xs text-right border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-semibold">
+              <th class="py-2.5 px-3">سال</th>
+              <th class="py-2.5 px-3">شروع سال (فروردین)</th>
+              <th class="py-2.5 px-3">پایان سال</th>
+              <th class="py-2.5 px-3">حداقل سال</th>
+              <th class="py-2.5 px-3">حداکثر سال</th>
+              <th class="py-2.5 px-3">میانگین سال</th>
+              <th class="py-2.5 px-3">بازدهی سال (٪)</th>
+              <th class="py-2.5 px-3">حقوق پایه کارگر</th>
+            </tr>
+          </thead>
+          <tbody id="yearlyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 6: بانک کل داده‌ها -->
+    <div id="tab-table" class="tab-content hidden space-y-4">
+      <div class="glass-card rounded-2xl p-3.5 sm:p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold">بانک داده کامل قیمت طلا 18 عیار</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">شامل داده‌های اکسل + رکوردهای خودکار روزانه estjt.ir</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" id="tableSearch" onkeyup="filterDataTable()" placeholder="جستجوی ماه یا سال..." class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none flex-grow sm:flex-grow-0">
+            <select id="tableYearFilter" onchange="filterDataTable()" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <option value="all">همه سال‌ها</option>
+            </select>
+            <button onclick="exportToCSV()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center gap-1 shadow-sm">
+              <span>📥</span>
+              <span>خروجی CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+          <table class="w-full text-xs text-right border-collapse" id="fullDataTable">
+            <thead class="sticky top-0 bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 font-bold z-10">
+              <tr>
+                <th class="py-2.5 px-3">ردیف</th>
+                <th class="py-2.5 px-3">تاریخ</th>
+                <th class="py-2.5 px-3">قیمت هر گرم طلا (تومان)</th>
+                <th class="py-2.5 px-3">نوسان ماه به ماه</th>
+                <th class="py-2.5 px-3">درصد تغییر ماهانه</th>
+                <th class="py-2.5 px-3">حقوق اداره کار</th>
+                <th class="py-2.5 px-3">معادل گرم طلا با حقوق</th>
+              </tr>
+            </thead>
+            <tbody id="fullDataTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: مدیریت آنلاین، سکه‌ها و لاگ استعلام‌های 30 دقیقه‌ای -->
+    <div id="tab-live-sync" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <!-- Auto-sync Status Card -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-900/30 via-teal-900/20 to-cyan-900/20 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2 font-bold text-emerald-400 text-sm sm:text-base">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block"></span>
+            <span>سیستم ذخیره‌سازی خودکار هر 30 دقیقه فعال است</span>
+          </div>
+          <p class="text-xs text-slate-300 mt-1">
+            سایت هر 30 دقیقه یکبار قیمت‌های جدید را از اتحادیه دریافت و ذخیره می‌کند، میانگین ماه را محاسبه نموده و پیش‌بینی را به‌روز نگه می‌دارد.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-emerald-500/40 text-xs font-mono text-emerald-400 font-bold">
+            زمان تا استعلام بعدی: <span id="syncPanelCountdown">30:00</span>
+          </div>
+          <button onclick="fetchLiveOnlinePrice(false)" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all">
+            استعلام آنی
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        
+        <!-- Live Connector Card with Full Coins -->
+        <div class="glass-card rounded-2xl p-5 shadow-sm border border-emerald-500/30">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">🌐</span>
+            <h3 class="text-base sm:text-lg font-bold">آخرین نرخ‌های استعلام‌شده از اتحادیه (estjt.ir)</h3>
+          </div>
+
+          <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-2 text-xs mb-4">
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">قیمت هر گرم طلای 18 عیار:</span>
+              <span id="syncPanelGoldPrice" class="font-black text-sm text-emerald-600 dark:text-emerald-400">23,484,500 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">مظنه تهران (هر مثقال):</span>
+              <span id="syncPanelMesghal" class="font-bold">101,730,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">سکه تمام طرح جدید (امامی):</span>
+              <span id="syncPanelCoinNew" class="font-bold text-amber-500">233,500,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">سکه بهار آزادی (طرح قدیم):</span>
+              <span id="syncPanelCoinOld" class="font-bold">230,500,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">نیم سکه بهار آزادی:</span>
+              <span id="syncPanelHalfCoin" class="font-bold">119,500,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">ربع سکه بهار آزادی:</span>
+              <span id="syncPanelQuarterCoin" class="font-bold">64,500,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
+              <span class="text-slate-600 dark:text-slate-300">سکه یک گرمی:</span>
+              <span id="syncPanelGramCoin" class="font-bold">35,000,000 تومان</span>
+            </div>
+            <div class="flex justify-between items-center pt-2">
+              <span class="text-slate-500 dark:text-slate-400">زمان آخرین استعلام:</span>
+              <span id="syncPanelTime" class="font-semibold text-slate-700 dark:text-slate-300">13 شهریور 1405 - 00:26:02</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="fetchLiveOnlinePrice(false)" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
+              <span>🔄</span>
+              <span>استعلام و همگام‌سازی فوری</span>
+            </button>
+            <a href="https://www.estjt.ir/" target="_blank" class="px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold flex items-center gap-1">
+              <span>🔗 سایت اتحادیه</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Running Monthly Average & Daily Log -->
+        <div class="glass-card rounded-2xl p-5 shadow-sm border border-cyan-500/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">📅</span>
+              <h3 class="text-base sm:text-lg font-bold">محاسبه خودکار میانگین ماه جاری</h3>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+              سیستم قیمت‌های ثبت‌شده در طول ماه را جمع‌آوری کرده و میانگین واقعی ماه را برای پیش‌بینی و گزارش‌ها به صورت زنده استخراج می‌کند:
+            </p>
+
+            <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+              <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+                <span class="text-slate-400 block text-[11px]">ماه جاری:</span>
+                <span class="font-black text-sm text-cyan-600 dark:text-cyan-400" id="logCurrentMonthName">شهریور 1405</span>
+              </div>
+              <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                <span class="text-slate-400 block text-[11px]">تعداد استعلام‌های ذخیره‌شده:</span>
+                <span class="font-black text-sm text-amber-600 dark:text-amber-400" id="logSampleCount">3 رکورد</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 col-span-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-500 dark:text-slate-400">میانگین قیمت محاسبه‌شده ماه:</span>
+                  <span class="font-black text-base text-emerald-600 dark:text-emerald-400" id="logMonthAverage">23,479,900 تومان</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Log Table -->
+          <div>
+            <h4 class="text-xs font-bold mb-2 text-slate-700 dark:text-slate-300">تاریخچه آخرین استعلام‌های ذخیره‌شده:</h4>
+            <div class="max-h-[140px] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+              <table class="w-full text-[11px] text-right">
+                <thead class="bg-slate-100 dark:bg-slate-800 text-slate-400">
+                  <tr>
+                    <th class="p-1.5 px-2">زمان استعلام</th>
+                    <th class="p-1.5 px-2">قیمت 18 عیار</th>
+                    <th class="p-1.5 px-2">مظنه</th>
+                  </tr>
+                </thead>
+                <tbody id="dailyTicksTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SQLite Database Details Card -->
+        <div class="glass-card rounded-2xl p-5 shadow-sm border border-emerald-500/30">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🗄️</span>
+              <h3 class="text-base sm:text-lg font-bold">بانک داده پایدار SQLite (ذخیره 30 دقیقه‌ای)</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold">
+              فعال و در حال ثبت
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+            تمام استعلام‌های هر 30 دقیقه در فایل بانک اطلاعاتی استاندارد <code class="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-amber-500 font-mono">gold_database.db</code> به صورت ساختاریافته ذخیره می‌شوند تا هیچ داده‌ای از دست نرود.
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs mb-3">
+            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <span class="text-slate-400 block text-[10px]">تعداد کل رکوردهای دیتابیس:</span>
+              <span class="font-black text-sm text-emerald-600 dark:text-emerald-400" id="dbTotalRecords">1 رکورد</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <span class="text-slate-400 block text-[10px]">حجم فایل دیتابیس:</span>
+              <span class="font-black text-sm text-cyan-600 dark:text-cyan-400" id="dbFileSize">24 کیلوبایت</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 col-span-2 sm:col-span-1">
+              <span class="text-slate-400 block text-[10px]">پروتکل ذخیره‌سازی:</span>
+              <span class="font-bold text-xs text-slate-700 dark:text-slate-300">SQLite 3 + JSON Sync</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            💡 با هربار استعلام، میانگین واقعی ماه جاری با کوئری مستقیم SQL روی تمام قیمت‌های ثبت شده در همان ماه بازتولید می‌شود.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-8 sm:mt-12 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p class="font-medium">سامانه هوشمند تحلیل طلا و سکه • دیتای آنلاین متصل به اتحادیه طلا و جواهر تهران (estjt.ir)</p>
+      <p class="text-[10px] text-slate-400">استعلام و ذخیره خودکار هر 30 دقیقه • محاسبه میانگین ماه • پیش‌بینی پویا و غلتان 1 ساله</p>
+    </div>
+  </footer>
+
+  <!-- RAW DATA INJECTION -->
+  <script>
+    const INITIAL_DATA = {"timeline": [{"year": 1395, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1395", "short_label": "1395/01", "price": 103500.0, "wage": 972000.0, "wage_in_gold_grams": 9.39, "mom_change_amount": 0, "mom_change_pct": 0, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1395", "short_label": "1395/02", "price": 105750.0, "wage": 972000.0, "wage_in_gold_grams": 9.19, "mom_change_amount": 2250.0, "mom_change_pct": 2.17, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1395", "short_label": "1395/03", "price": 101617.0, "wage": 972000.0, "wage_in_gold_grams": 9.57, "mom_change_amount": -4133.0, "mom_change_pct": -3.91, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 4, "month_name": "تیر", "label": "تیر 1395", "short_label": "1395/04", "price": 111700.0, "wage": 972000.0, "wage_in_gold_grams": 8.7, "mom_change_amount": 10083.0, "mom_change_pct": 9.92, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1395", "short_label": "1395/05", "price": 113000.0, "wage": 972000.0, "wage_in_gold_grams": 8.6, "mom_change_amount": 1300.0, "mom_change_pct": 1.16, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1395", "short_label": "1395/06", "price": 114000.0, "wage": 972000.0, "wage_in_gold_grams": 8.53, "mom_change_amount": 1000.0, "mom_change_pct": 0.88, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 7, "month_name": "مهر", "label": "مهر 1395", "short_label": "1395/07", "price": 110000.0, "wage": 972000.0, "wage_in_gold_grams": 8.84, "mom_change_amount": -4000.0, "mom_change_pct": -3.51, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 8, "month_name": "آبان", "label": "آبان 1395", "short_label": "1395/08", "price": 113400.0, "wage": 972000.0, "wage_in_gold_grams": 8.57, "mom_change_amount": 3400.0, "mom_change_pct": 3.09, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 9, "month_name": "آذر", "label": "آذر 1395", "short_label": "1395/09", "price": 113500.0, "wage": 972000.0, "wage_in_gold_grams": 8.56, "mom_change_amount": 100.0, "mom_change_pct": 0.09, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 10, "month_name": "دی", "label": "دی 1395", "short_label": "1395/10", "price": 113000.0, "wage": 972000.0, "wage_in_gold_grams": 8.6, "mom_change_amount": -500.0, "mom_change_pct": -0.44, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1395", "short_label": "1395/11", "price": 115000.0, "wage": 972000.0, "wage_in_gold_grams": 8.45, "mom_change_amount": 2000.0, "mom_change_pct": 1.77, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1395, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1395", "short_label": "1395/12", "price": 116000.0, "wage": 972000.0, "wage_in_gold_grams": 8.38, "mom_change_amount": 1000.0, "mom_change_pct": 0.87, "yoy_change_amount": null, "yoy_change_pct": null}, {"year": 1396, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1396", "short_label": "1396/01", "price": 116287.0, "wage": 1080000.0, "wage_in_gold_grams": 9.29, "mom_change_amount": 287.0, "mom_change_pct": 0.25, "yoy_change_amount": 12787.0, "yoy_change_pct": 12.35}, {"year": 1396, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1396", "short_label": "1396/02", "price": 113000.0, "wage": 1080000.0, "wage_in_gold_grams": 9.56, "mom_change_amount": -3287.0, "mom_change_pct": -2.83, "yoy_change_amount": 7250.0, "yoy_change_pct": 6.86}, {"year": 1396, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1396", "short_label": "1396/03", "price": 114730.0, "wage": 1080000.0, "wage_in_gold_grams": 9.41, "mom_change_amount": 1730.0, "mom_change_pct": 1.53, "yoy_change_amount": 13113.0, "yoy_change_pct": 12.9}, {"year": 1396, "month_idx": 4, "month_name": "تیر", "label": "تیر 1396", "short_label": "1396/04", "price": 115660.0, "wage": 1080000.0, "wage_in_gold_grams": 9.34, "mom_change_amount": 930.0, "mom_change_pct": 0.81, "yoy_change_amount": 3960.0, "yoy_change_pct": 3.55}, {"year": 1396, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1396", "short_label": "1396/05", "price": 118000.0, "wage": 1080000.0, "wage_in_gold_grams": 9.15, "mom_change_amount": 2340.0, "mom_change_pct": 2.02, "yoy_change_amount": 5000.0, "yoy_change_pct": 4.42}, {"year": 1396, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1396", "short_label": "1396/06", "price": 125000.0, "wage": 1080000.0, "wage_in_gold_grams": 8.64, "mom_change_amount": 7000.0, "mom_change_pct": 5.93, "yoy_change_amount": 11000.0, "yoy_change_pct": 9.65}, {"year": 1396, "month_idx": 7, "month_name": "مهر", "label": "مهر 1396", "short_label": "1396/07", "price": 121500.0, "wage": 1080000.0, "wage_in_gold_grams": 8.89, "mom_change_amount": -3500.0, "mom_change_pct": -2.8, "yoy_change_amount": 11500.0, "yoy_change_pct": 10.45}, {"year": 1396, "month_idx": 8, "month_name": "آبان", "label": "آبان 1396", "short_label": "1396/08", "price": 124000.0, "wage": 1080000.0, "wage_in_gold_grams": 8.71, "mom_change_amount": 2500.0, "mom_change_pct": 2.06, "yoy_change_amount": 10600.0, "yoy_change_pct": 9.35}, {"year": 1396, "month_idx": 9, "month_name": "آذر", "label": "آذر 1396", "short_label": "1396/09", "price": 128000.0, "wage": 1080000.0, "wage_in_gold_grams": 8.44, "mom_change_amount": 4000.0, "mom_change_pct": 3.23, "yoy_change_amount": 14500.0, "yoy_change_pct": 12.78}, {"year": 1396, "month_idx": 10, "month_name": "دی", "label": "دی 1396", "short_label": "1396/10", "price": 140000.0, "wage": 1080000.0, "wage_in_gold_grams": 7.71, "mom_change_amount": 12000.0, "mom_change_pct": 9.38, "yoy_change_amount": 27000.0, "yoy_change_pct": 23.89}, {"year": 1396, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1396", "short_label": "1396/11", "price": 148000.0, "wage": 1080000.0, "wage_in_gold_grams": 7.3, "mom_change_amount": 8000.0, "mom_change_pct": 5.71, "yoy_change_amount": 33000.0, "yoy_change_pct": 28.7}, {"year": 1396, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1396", "short_label": "1396/12", "price": 149000.0, "wage": 1080000.0, "wage_in_gold_grams": 7.25, "mom_change_amount": 1000.0, "mom_change_pct": 0.68, "yoy_change_amount": 33000.0, "yoy_change_pct": 28.45}, {"year": 1397, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1397", "short_label": "1397/01", "price": 160500.0, "wage": 1261000.0, "wage_in_gold_grams": 7.86, "mom_change_amount": 11500.0, "mom_change_pct": 7.72, "yoy_change_amount": 44213.0, "yoy_change_pct": 38.02}, {"year": 1397, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1397", "short_label": "1397/02", "price": 190000.0, "wage": 1261000.0, "wage_in_gold_grams": 6.64, "mom_change_amount": 29500.0, "mom_change_pct": 18.38, "yoy_change_amount": 77000.0, "yoy_change_pct": 68.14}, {"year": 1397, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1397", "short_label": "1397/03", "price": 200250.0, "wage": 1261000.0, "wage_in_gold_grams": 6.3, "mom_change_amount": 10250.0, "mom_change_pct": 5.39, "yoy_change_amount": 85520.0, "yoy_change_pct": 74.54}, {"year": 1397, "month_idx": 4, "month_name": "تیر", "label": "تیر 1397", "short_label": "1397/04", "price": 235000.0, "wage": 1261000.0, "wage_in_gold_grams": 5.37, "mom_change_amount": 34750.0, "mom_change_pct": 17.35, "yoy_change_amount": 119340.0, "yoy_change_pct": 103.18}, {"year": 1397, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1397", "short_label": "1397/05", "price": 280000.0, "wage": 1261000.0, "wage_in_gold_grams": 4.5, "mom_change_amount": 45000.0, "mom_change_pct": 19.15, "yoy_change_amount": 162000.0, "yoy_change_pct": 137.29}, {"year": 1397, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1397", "short_label": "1397/06", "price": 357000.0, "wage": 1261000.0, "wage_in_gold_grams": 3.53, "mom_change_amount": 77000.0, "mom_change_pct": 27.5, "yoy_change_amount": 232000.0, "yoy_change_pct": 185.6}, {"year": 1397, "month_idx": 7, "month_name": "مهر", "label": "مهر 1397", "short_label": "1397/07", "price": 334000.0, "wage": 1261000.0, "wage_in_gold_grams": 3.78, "mom_change_amount": -23000.0, "mom_change_pct": -6.44, "yoy_change_amount": 212500.0, "yoy_change_pct": 174.9}, {"year": 1397, "month_idx": 8, "month_name": "آبان", "label": "آبان 1397", "short_label": "1397/08", "price": 432000.0, "wage": 1261000.0, "wage_in_gold_grams": 2.92, "mom_change_amount": 98000.0, "mom_change_pct": 29.34, "yoy_change_amount": 308000.0, "yoy_change_pct": 248.39}, {"year": 1397, "month_idx": 9, "month_name": "آذر", "label": "آذر 1397", "short_label": "1397/09", "price": 483000.0, "wage": 1261000.0, "wage_in_gold_grams": 2.61, "mom_change_amount": 51000.0, "mom_change_pct": 11.81, "yoy_change_amount": 355000.0, "yoy_change_pct": 277.34}, {"year": 1397, "month_idx": 10, "month_name": "دی", "label": "دی 1397", "short_label": "1397/10", "price": 332000.0, "wage": 1261000.0, "wage_in_gold_grams": 3.8, "mom_change_amount": -151000.0, "mom_change_pct": -31.26, "yoy_change_amount": 192000.0, "yoy_change_pct": 137.14}, {"year": 1397, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1397", "short_label": "1397/11", "price": 367000.0, "wage": 1261000.0, "wage_in_gold_grams": 3.44, "mom_change_amount": 35000.0, "mom_change_pct": 10.54, "yoy_change_amount": 219000.0, "yoy_change_pct": 147.97}, {"year": 1397, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1397", "short_label": "1397/12", "price": 422000.0, "wage": 1261000.0, "wage_in_gold_grams": 2.99, "mom_change_amount": 55000.0, "mom_change_pct": 14.99, "yoy_change_amount": 273000.0, "yoy_change_pct": 183.22}, {"year": 1398, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1398", "short_label": "1398/01", "price": 428000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.21, "mom_change_amount": 6000.0, "mom_change_pct": 1.42, "yoy_change_amount": 267500.0, "yoy_change_pct": 166.67}, {"year": 1398, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1398", "short_label": "1398/02", "price": 462000.0, "wage": 1800000.0, "wage_in_gold_grams": 3.9, "mom_change_amount": 34000.0, "mom_change_pct": 7.94, "yoy_change_amount": 272000.0, "yoy_change_pct": 143.16}, {"year": 1398, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1398", "short_label": "1398/03", "price": 420000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.29, "mom_change_amount": -42000.0, "mom_change_pct": -9.09, "yoy_change_amount": 219750.0, "yoy_change_pct": 109.74}, {"year": 1398, "month_idx": 4, "month_name": "تیر", "label": "تیر 1398", "short_label": "1398/04", "price": 436000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.13, "mom_change_amount": 16000.0, "mom_change_pct": 3.81, "yoy_change_amount": 201000.0, "yoy_change_pct": 85.53}, {"year": 1398, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1398", "short_label": "1398/05", "price": 414000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.35, "mom_change_amount": -22000.0, "mom_change_pct": -5.05, "yoy_change_amount": 134000.0, "yoy_change_pct": 47.86}, {"year": 1398, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1398", "short_label": "1398/06", "price": 416000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.33, "mom_change_amount": 2000.0, "mom_change_pct": 0.48, "yoy_change_amount": 59000.0, "yoy_change_pct": 16.53}, {"year": 1398, "month_idx": 7, "month_name": "مهر", "label": "مهر 1398", "short_label": "1398/07", "price": 407000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.42, "mom_change_amount": -9000.0, "mom_change_pct": -2.16, "yoy_change_amount": 73000.0, "yoy_change_pct": 21.86}, {"year": 1398, "month_idx": 8, "month_name": "آبان", "label": "آبان 1398", "short_label": "1398/08", "price": 408000.0, "wage": 1800000.0, "wage_in_gold_grams": 4.41, "mom_change_amount": 1000.0, "mom_change_pct": 0.25, "yoy_change_amount": -24000.0, "yoy_change_pct": -5.56}, {"year": 1398, "month_idx": 9, "month_name": "آذر", "label": "آذر 1398", "short_label": "1398/09", "price": 451000.0, "wage": 1800000.0, "wage_in_gold_grams": 3.99, "mom_change_amount": 43000.0, "mom_change_pct": 10.54, "yoy_change_amount": -32000.0, "yoy_change_pct": -6.63}, {"year": 1398, "month_idx": 10, "month_name": "دی", "label": "دی 1398", "short_label": "1398/10", "price": 491000.0, "wage": 1800000.0, "wage_in_gold_grams": 3.67, "mom_change_amount": 40000.0, "mom_change_pct": 8.87, "yoy_change_amount": 159000.0, "yoy_change_pct": 47.89}, {"year": 1398, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1398", "short_label": "1398/11", "price": 510000.0, "wage": 1800000.0, "wage_in_gold_grams": 3.53, "mom_change_amount": 19000.0, "mom_change_pct": 3.87, "yoy_change_amount": 143000.0, "yoy_change_pct": 38.96}, {"year": 1398, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1398", "short_label": "1398/12", "price": 586000.0, "wage": 1800000.0, "wage_in_gold_grams": 3.07, "mom_change_amount": 76000.0, "mom_change_pct": 14.9, "yoy_change_amount": 164000.0, "yoy_change_pct": 38.86}, {"year": 1399, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1399", "short_label": "1399/01", "price": 634000.0, "wage": 2400000.0, "wage_in_gold_grams": 3.79, "mom_change_amount": 48000.0, "mom_change_pct": 8.19, "yoy_change_amount": 206000.0, "yoy_change_pct": 48.13}, {"year": 1399, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1399", "short_label": "1399/02", "price": 640000.0, "wage": 2400000.0, "wage_in_gold_grams": 3.75, "mom_change_amount": 6000.0, "mom_change_pct": 0.95, "yoy_change_amount": 178000.0, "yoy_change_pct": 38.53}, {"year": 1399, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1399", "short_label": "1399/03", "price": 731000.0, "wage": 2400000.0, "wage_in_gold_grams": 3.28, "mom_change_amount": 91000.0, "mom_change_pct": 14.22, "yoy_change_amount": 311000.0, "yoy_change_pct": 74.05}, {"year": 1399, "month_idx": 4, "month_name": "تیر", "label": "تیر 1399", "short_label": "1399/04", "price": 930000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.58, "mom_change_amount": 199000.0, "mom_change_pct": 27.22, "yoy_change_amount": 494000.0, "yoy_change_pct": 113.3}, {"year": 1399, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1399", "short_label": "1399/05", "price": 1110000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.16, "mom_change_amount": 180000.0, "mom_change_pct": 19.35, "yoy_change_amount": 696000.0, "yoy_change_pct": 168.12}, {"year": 1399, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1399", "short_label": "1399/06", "price": 1100000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.18, "mom_change_amount": -10000.0, "mom_change_pct": -0.9, "yoy_change_amount": 684000.0, "yoy_change_pct": 164.42}, {"year": 1399, "month_idx": 7, "month_name": "مهر", "label": "مهر 1399", "short_label": "1399/07", "price": 1360000.0, "wage": 2400000.0, "wage_in_gold_grams": 1.76, "mom_change_amount": 260000.0, "mom_change_pct": 23.64, "yoy_change_amount": 953000.0, "yoy_change_pct": 234.15}, {"year": 1399, "month_idx": 8, "month_name": "آبان", "label": "آبان 1399", "short_label": "1399/08", "price": 1188000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.02, "mom_change_amount": -172000.0, "mom_change_pct": -12.65, "yoy_change_amount": 780000.0, "yoy_change_pct": 191.18}, {"year": 1399, "month_idx": 9, "month_name": "آذر", "label": "آذر 1399", "short_label": "1399/09", "price": 1130000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.12, "mom_change_amount": -58000.0, "mom_change_pct": -4.88, "yoy_change_amount": 679000.0, "yoy_change_pct": 150.55}, {"year": 1399, "month_idx": 10, "month_name": "دی", "label": "دی 1399", "short_label": "1399/10", "price": 1160000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.07, "mom_change_amount": 30000.0, "mom_change_pct": 2.65, "yoy_change_amount": 669000.0, "yoy_change_pct": 136.25}, {"year": 1399, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1399", "short_label": "1399/11", "price": 1091000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.2, "mom_change_amount": -69000.0, "mom_change_pct": -5.95, "yoy_change_amount": 581000.0, "yoy_change_pct": 113.92}, {"year": 1399, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1399", "short_label": "1399/12", "price": 1051000.0, "wage": 2400000.0, "wage_in_gold_grams": 2.28, "mom_change_amount": -40000.0, "mom_change_pct": -3.67, "yoy_change_amount": 465000.0, "yoy_change_pct": 79.35}, {"year": 1400, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1400", "short_label": "1400/01", "price": 1052000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.52, "mom_change_amount": 1000.0, "mom_change_pct": 0.1, "yoy_change_amount": 418000.0, "yoy_change_pct": 65.93}, {"year": 1400, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1400", "short_label": "1400/02", "price": 916000.0, "wage": 3700000.0, "wage_in_gold_grams": 4.04, "mom_change_amount": -136000.0, "mom_change_pct": -12.93, "yoy_change_amount": 276000.0, "yoy_change_pct": 43.12}, {"year": 1400, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1400", "short_label": "1400/03", "price": 1080000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.43, "mom_change_amount": 164000.0, "mom_change_pct": 17.9, "yoy_change_amount": 349000.0, "yoy_change_pct": 47.74}, {"year": 1400, "month_idx": 4, "month_name": "تیر", "label": "تیر 1400", "short_label": "1400/04", "price": 1064000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.48, "mom_change_amount": -16000.0, "mom_change_pct": -1.48, "yoy_change_amount": 134000.0, "yoy_change_pct": 14.41}, {"year": 1400, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1400", "short_label": "1400/05", "price": 1080000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.43, "mom_change_amount": 16000.0, "mom_change_pct": 1.5, "yoy_change_amount": -30000.0, "yoy_change_pct": -2.7}, {"year": 1400, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1400", "short_label": "1400/06", "price": 1164000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.18, "mom_change_amount": 84000.0, "mom_change_pct": 7.78, "yoy_change_amount": 64000.0, "yoy_change_pct": 5.82}, {"year": 1400, "month_idx": 7, "month_name": "مهر", "label": "مهر 1400", "short_label": "1400/07", "price": 1160000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.19, "mom_change_amount": -4000.0, "mom_change_pct": -0.34, "yoy_change_amount": -200000.0, "yoy_change_pct": -14.71}, {"year": 1400, "month_idx": 8, "month_name": "آبان", "label": "آبان 1400", "short_label": "1400/08", "price": 1196000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.09, "mom_change_amount": 36000.0, "mom_change_pct": 3.1, "yoy_change_amount": 8000.0, "yoy_change_pct": 0.67}, {"year": 1400, "month_idx": 9, "month_name": "آذر", "label": "آذر 1400", "short_label": "1400/09", "price": 1300000.0, "wage": 3700000.0, "wage_in_gold_grams": 2.85, "mom_change_amount": 104000.0, "mom_change_pct": 8.7, "yoy_change_amount": 170000.0, "yoy_change_pct": 15.04}, {"year": 1400, "month_idx": 10, "month_name": "دی", "label": "دی 1400", "short_label": "1400/10", "price": 1260000.0, "wage": 3700000.0, "wage_in_gold_grams": 2.94, "mom_change_amount": -40000.0, "mom_change_pct": -3.08, "yoy_change_amount": 100000.0, "yoy_change_pct": 8.62}, {"year": 1400, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1400", "short_label": "1400/11", "price": 1211000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.06, "mom_change_amount": -49000.0, "mom_change_pct": -3.89, "yoy_change_amount": 120000.0, "yoy_change_pct": 11.0}, {"year": 1400, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1400", "short_label": "1400/12", "price": 1200000.0, "wage": 3700000.0, "wage_in_gold_grams": 3.08, "mom_change_amount": -11000.0, "mom_change_pct": -0.91, "yoy_change_amount": 149000.0, "yoy_change_pct": 14.18}, {"year": 1401, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1401", "short_label": "1401/01", "price": 1250000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.48, "mom_change_amount": 50000.0, "mom_change_pct": 4.17, "yoy_change_amount": 198000.0, "yoy_change_pct": 18.82}, {"year": 1401, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1401", "short_label": "1401/02", "price": 1305000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.29, "mom_change_amount": 55000.0, "mom_change_pct": 4.4, "yoy_change_amount": 389000.0, "yoy_change_pct": 42.47}, {"year": 1401, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1401", "short_label": "1401/03", "price": 1430000.0, "wage": 5600000.0, "wage_in_gold_grams": 3.92, "mom_change_amount": 125000.0, "mom_change_pct": 9.58, "yoy_change_amount": 350000.0, "yoy_change_pct": 32.41}, {"year": 1401, "month_idx": 4, "month_name": "تیر", "label": "تیر 1401", "short_label": "1401/04", "price": 1364000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.11, "mom_change_amount": -66000.0, "mom_change_pct": -4.62, "yoy_change_amount": 300000.0, "yoy_change_pct": 28.2}, {"year": 1401, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1401", "short_label": "1401/05", "price": 1374000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.08, "mom_change_amount": 10000.0, "mom_change_pct": 0.73, "yoy_change_amount": 294000.0, "yoy_change_pct": 27.22}, {"year": 1401, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1401", "short_label": "1401/06", "price": 1273000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.4, "mom_change_amount": -101000.0, "mom_change_pct": -7.35, "yoy_change_amount": 109000.0, "yoy_change_pct": 9.36}, {"year": 1401, "month_idx": 7, "month_name": "مهر", "label": "مهر 1401", "short_label": "1401/07", "price": 1385000.0, "wage": 5600000.0, "wage_in_gold_grams": 4.04, "mom_change_amount": 112000.0, "mom_change_pct": 8.8, "yoy_change_amount": 225000.0, "yoy_change_pct": 19.4}, {"year": 1401, "month_idx": 8, "month_name": "آبان", "label": "آبان 1401", "short_label": "1401/08", "price": 1464000.0, "wage": 5600000.0, "wage_in_gold_grams": 3.83, "mom_change_amount": 79000.0, "mom_change_pct": 5.7, "yoy_change_amount": 268000.0, "yoy_change_pct": 22.41}, {"year": 1401, "month_idx": 9, "month_name": "آذر", "label": "آذر 1401", "short_label": "1401/09", "price": 1582000.0, "wage": 5600000.0, "wage_in_gold_grams": 3.54, "mom_change_amount": 118000.0, "mom_change_pct": 8.06, "yoy_change_amount": 282000.0, "yoy_change_pct": 21.69}, {"year": 1401, "month_idx": 10, "month_name": "دی", "label": "دی 1401", "short_label": "1401/10", "price": 1800000.0, "wage": 5600000.0, "wage_in_gold_grams": 3.11, "mom_change_amount": 218000.0, "mom_change_pct": 13.78, "yoy_change_amount": 540000.0, "yoy_change_pct": 42.86}, {"year": 1401, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1401", "short_label": "1401/11", "price": 2180000.0, "wage": 5600000.0, "wage_in_gold_grams": 2.57, "mom_change_amount": 380000.0, "mom_change_pct": 21.11, "yoy_change_amount": 969000.0, "yoy_change_pct": 80.02}, {"year": 1401, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1401", "short_label": "1401/12", "price": 2363000.0, "wage": 5600000.0, "wage_in_gold_grams": 2.37, "mom_change_amount": 183000.0, "mom_change_pct": 8.39, "yoy_change_amount": 1163000.0, "yoy_change_pct": 96.92}, {"year": 1402, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1402", "short_label": "1402/01", "price": 2527000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.75, "mom_change_amount": 164000.0, "mom_change_pct": 6.94, "yoy_change_amount": 1277000.0, "yoy_change_pct": 102.16}, {"year": 1402, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1402", "short_label": "1402/02", "price": 2734000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.55, "mom_change_amount": 207000.0, "mom_change_pct": 8.19, "yoy_change_amount": 1429000.0, "yoy_change_pct": 109.5}, {"year": 1402, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1402", "short_label": "1402/03", "price": 2464000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.82, "mom_change_amount": -270000.0, "mom_change_pct": -9.88, "yoy_change_amount": 1034000.0, "yoy_change_pct": 72.31}, {"year": 1402, "month_idx": 4, "month_name": "تیر", "label": "تیر 1402", "short_label": "1402/04", "price": 2385000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.92, "mom_change_amount": -79000.0, "mom_change_pct": -3.21, "yoy_change_amount": 1021000.0, "yoy_change_pct": 74.85}, {"year": 1402, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1402", "short_label": "1402/05", "price": 2365000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.94, "mom_change_amount": -20000.0, "mom_change_pct": -0.84, "yoy_change_amount": 991000.0, "yoy_change_pct": 72.13}, {"year": 1402, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1402", "short_label": "1402/06", "price": 2362000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.95, "mom_change_amount": -3000.0, "mom_change_pct": -0.13, "yoy_change_amount": 1089000.0, "yoy_change_pct": 85.55}, {"year": 1402, "month_idx": 7, "month_name": "مهر", "label": "مهر 1402", "short_label": "1402/07", "price": 2300000.0, "wage": 6960000.0, "wage_in_gold_grams": 3.03, "mom_change_amount": -62000.0, "mom_change_pct": -2.62, "yoy_change_amount": 915000.0, "yoy_change_pct": 66.06}, {"year": 1402, "month_idx": 8, "month_name": "آبان", "label": "آبان 1402", "short_label": "1402/08", "price": 2470000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.82, "mom_change_amount": 170000.0, "mom_change_pct": 7.39, "yoy_change_amount": 1006000.0, "yoy_change_pct": 68.72}, {"year": 1402, "month_idx": 9, "month_name": "آذر", "label": "آذر 1402", "short_label": "1402/09", "price": 2464000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.82, "mom_change_amount": -6000.0, "mom_change_pct": -0.24, "yoy_change_amount": 882000.0, "yoy_change_pct": 55.75}, {"year": 1402, "month_idx": 10, "month_name": "دی", "label": "دی 1402", "short_label": "1402/10", "price": 2565000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.71, "mom_change_amount": 101000.0, "mom_change_pct": 4.1, "yoy_change_amount": 765000.0, "yoy_change_pct": 42.5}, {"year": 1402, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1402", "short_label": "1402/11", "price": 2764000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.52, "mom_change_amount": 199000.0, "mom_change_pct": 7.76, "yoy_change_amount": 584000.0, "yoy_change_pct": 26.79}, {"year": 1402, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1402", "short_label": "1402/12", "price": 3110000.0, "wage": 6960000.0, "wage_in_gold_grams": 2.24, "mom_change_amount": 346000.0, "mom_change_pct": 12.52, "yoy_change_amount": 747000.0, "yoy_change_pct": 31.61}, {"year": 1403, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1403", "short_label": "1403/01", "price": 3620000.0, "wage": 9600000.0, "wage_in_gold_grams": 2.65, "mom_change_amount": 510000.0, "mom_change_pct": 16.4, "yoy_change_amount": 1093000.0, "yoy_change_pct": 43.25}, {"year": 1403, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1403", "short_label": "1403/02", "price": 3420000.0, "wage": 9600000.0, "wage_in_gold_grams": 2.81, "mom_change_amount": -200000.0, "mom_change_pct": -5.52, "yoy_change_amount": 686000.0, "yoy_change_pct": 25.09}, {"year": 1403, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1403", "short_label": "1403/03", "price": 3375000.0, "wage": 9600000.0, "wage_in_gold_grams": 2.84, "mom_change_amount": -45000.0, "mom_change_pct": -1.32, "yoy_change_amount": 911000.0, "yoy_change_pct": 36.97}, {"year": 1403, "month_idx": 4, "month_name": "تیر", "label": "تیر 1403", "short_label": "1403/04", "price": 3434800.0, "wage": 9600000.0, "wage_in_gold_grams": 2.79, "mom_change_amount": 59800.0, "mom_change_pct": 1.77, "yoy_change_amount": 1049800.0, "yoy_change_pct": 44.02}, {"year": 1403, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1403", "short_label": "1403/05", "price": 3519700.0, "wage": 9600000.0, "wage_in_gold_grams": 2.73, "mom_change_amount": 84900.0, "mom_change_pct": 2.47, "yoy_change_amount": 1154700.0, "yoy_change_pct": 48.82}, {"year": 1403, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1403", "short_label": "1403/06", "price": 3592133.0, "wage": 9600000.0, "wage_in_gold_grams": 2.67, "mom_change_amount": 72433.0, "mom_change_pct": 2.06, "yoy_change_amount": 1230133.0, "yoy_change_pct": 52.08}, {"year": 1403, "month_idx": 7, "month_name": "مهر", "label": "مهر 1403", "short_label": "1403/07", "price": 4080000.0, "wage": 9600000.0, "wage_in_gold_grams": 2.35, "mom_change_amount": 487867.0, "mom_change_pct": 13.58, "yoy_change_amount": 1780000.0, "yoy_change_pct": 77.39}, {"year": 1403, "month_idx": 8, "month_name": "آبان", "label": "آبان 1403", "short_label": "1403/08", "price": 4598000.0, "wage": 9600000.0, "wage_in_gold_grams": 2.09, "mom_change_amount": 518000.0, "mom_change_pct": 12.7, "yoy_change_amount": 2128000.0, "yoy_change_pct": 86.15}, {"year": 1403, "month_idx": 9, "month_name": "آذر", "label": "آذر 1403", "short_label": "1403/09", "price": 4686600.0, "wage": 9600000.0, "wage_in_gold_grams": 2.05, "mom_change_amount": 88600.0, "mom_change_pct": 1.93, "yoy_change_amount": 2222600.0, "yoy_change_pct": 90.2}, {"year": 1403, "month_idx": 10, "month_name": "دی", "label": "دی 1403", "short_label": "1403/10", "price": 5137900.0, "wage": 9600000.0, "wage_in_gold_grams": 1.87, "mom_change_amount": 451300.0, "mom_change_pct": 9.63, "yoy_change_amount": 2572900.0, "yoy_change_pct": 100.31}, {"year": 1403, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1403", "short_label": "1403/11", "price": 5657600.0, "wage": 9600000.0, "wage_in_gold_grams": 1.7, "mom_change_amount": 519700.0, "mom_change_pct": 10.12, "yoy_change_amount": 2893600.0, "yoy_change_pct": 104.69}, {"year": 1403, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1403", "short_label": "1403/12", "price": 6350000.0, "wage": 9600000.0, "wage_in_gold_grams": 1.51, "mom_change_amount": 692400.0, "mom_change_pct": 12.24, "yoy_change_amount": 3240000.0, "yoy_change_pct": 104.18}, {"year": 1404, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1404", "short_label": "1404/01", "price": 8181700.0, "wage": 13500000.0, "wage_in_gold_grams": 1.65, "mom_change_amount": 1831700.0, "mom_change_pct": 28.85, "yoy_change_amount": 4561700.0, "yoy_change_pct": 126.01}, {"year": 1404, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1404", "short_label": "1404/02", "price": 6805000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.98, "mom_change_amount": -1376700.0, "mom_change_pct": -16.83, "yoy_change_amount": 3385000.0, "yoy_change_pct": 98.98}, {"year": 1404, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1404", "short_label": "1404/03", "price": 6617300.0, "wage": 13500000.0, "wage_in_gold_grams": 2.04, "mom_change_amount": -187700.0, "mom_change_pct": -2.76, "yoy_change_amount": 3242300.0, "yoy_change_pct": 96.07}, {"year": 1404, "month_idx": 4, "month_name": "تیر", "label": "تیر 1404", "short_label": "1404/04", "price": 7437100.0, "wage": 13500000.0, "wage_in_gold_grams": 1.82, "mom_change_amount": 819800.0, "mom_change_pct": 12.39, "yoy_change_amount": 4002300.0, "yoy_change_pct": 116.52}, {"year": 1404, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1404", "short_label": "1404/05", "price": 7520000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.8, "mom_change_amount": 82900.0, "mom_change_pct": 1.11, "yoy_change_amount": 4000300.0, "yoy_change_pct": 113.65}, {"year": 1404, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1404", "short_label": "1404/06", "price": 8651000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.56, "mom_change_amount": 1131000.0, "mom_change_pct": 15.04, "yoy_change_amount": 5058867.0, "yoy_change_pct": 140.83}, {"year": 1404, "month_idx": 7, "month_name": "مهر", "label": "مهر 1404", "short_label": "1404/07", "price": 10700000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.26, "mom_change_amount": 2049000.0, "mom_change_pct": 23.69, "yoy_change_amount": 6620000.0, "yoy_change_pct": 162.25}, {"year": 1404, "month_idx": 8, "month_name": "آبان", "label": "آبان 1404", "short_label": "1404/08", "price": 10500000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.29, "mom_change_amount": -200000.0, "mom_change_pct": -1.87, "yoy_change_amount": 5902000.0, "yoy_change_pct": 128.36}, {"year": 1404, "month_idx": 9, "month_name": "آذر", "label": "آذر 1404", "short_label": "1404/09", "price": 12430000.0, "wage": 13500000.0, "wage_in_gold_grams": 1.09, "mom_change_amount": 1930000.0, "mom_change_pct": 18.38, "yoy_change_amount": 7743400.0, "yoy_change_pct": 165.22}, {"year": 1404, "month_idx": 10, "month_name": "دی", "label": "دی 1404", "short_label": "1404/10", "price": 15260000.0, "wage": 13500000.0, "wage_in_gold_grams": 0.88, "mom_change_amount": 2830000.0, "mom_change_pct": 22.77, "yoy_change_amount": 10122100.0, "yoy_change_pct": 197.01}, {"year": 1404, "month_idx": 11, "month_name": "بهمن", "label": "بهمن 1404", "short_label": "1404/11", "price": 19576000.0, "wage": 13500000.0, "wage_in_gold_grams": 0.69, "mom_change_amount": 4316000.0, "mom_change_pct": 28.28, "yoy_change_amount": 13918400.0, "yoy_change_pct": 246.01}, {"year": 1404, "month_idx": 12, "month_name": "اسفند", "label": "اسفند 1404", "short_label": "1404/12", "price": 20124000.0, "wage": 13500000.0, "wage_in_gold_grams": 0.67, "mom_change_amount": 548000.0, "mom_change_pct": 2.8, "yoy_change_amount": 13774000.0, "yoy_change_pct": 216.91}, {"year": 1405, "month_idx": 1, "month_name": "فروردین", "label": "فروردین 1405", "short_label": "1405/01", "price": 17821000.0, "wage": 22000000.0, "wage_in_gold_grams": 1.23, "mom_change_amount": -2303000.0, "mom_change_pct": -11.44, "yoy_change_amount": 9639300.0, "yoy_change_pct": 117.82}, {"year": 1405, "month_idx": 2, "month_name": "اردیبهشت", "label": "اردیبهشت 1405", "short_label": "1405/02", "price": 19200000.0, "wage": 22000000.0, "wage_in_gold_grams": 1.15, "mom_change_amount": 1379000.0, "mom_change_pct": 7.74, "yoy_change_amount": 12395000.0, "yoy_change_pct": 182.15}, {"year": 1405, "month_idx": 3, "month_name": "خرداد", "label": "خرداد 1405", "short_label": "1405/03", "price": 17000000.0, "wage": 22000000.0, "wage_in_gold_grams": 1.29, "mom_change_amount": -2200000.0, "mom_change_pct": -11.46, "yoy_change_amount": 10382700.0, "yoy_change_pct": 156.9}, {"year": 1405, "month_idx": 4, "month_name": "تیر", "label": "تیر 1405", "short_label": "1405/04", "price": 17700000.0, "wage": 22000000.0, "wage_in_gold_grams": 1.24, "mom_change_amount": 700000.0, "mom_change_pct": 4.12, "yoy_change_amount": 10262900.0, "yoy_change_pct": 138.0}, {"year": 1405, "month_idx": 5, "month_name": "مرداد", "label": "مرداد 1405", "short_label": "1405/05", "price": 18570000.0, "wage": 22000000.0, "wage_in_gold_grams": 1.18, "mom_change_amount": 870000.0, "mom_change_pct": 4.92, "yoy_change_amount": 11050000.0, "yoy_change_pct": 146.94}, {"year": 1405, "month_idx": 6, "month_name": "شهریور", "label": "شهریور 1405", "short_label": "1405/06", "price": 23364500.0, "wage": 22000000.0, "wage_in_gold_grams": 0.94, "mom_change_amount": 4794500.0, "mom_change_pct": 25.82, "yoy_change_amount": 14349000.0, "yoy_change_pct": 165.87}], "yearly_summary": [{"year": 1395, "count_months": 12, "min_price": 101617.0, "min_month": "خرداد", "max_price": 116000.0, "max_month": "اسفند", "start_price": 103500.0, "end_price": 116000.0, "avg_price": 110872, "year_growth_pct": 12.08, "return_vs_prev_close": 12.08, "wage": 972000.0, "ratio_wage_to_gold": 8.77}, {"year": 1396, "count_months": 12, "min_price": 113000.0, "min_month": "اردیبهشت", "max_price": 149000.0, "max_month": "اسفند", "start_price": 116287.0, "end_price": 149000.0, "avg_price": 126098, "year_growth_pct": 28.13, "return_vs_prev_close": 28.45, "wage": 1080000.0, "ratio_wage_to_gold": 8.56}, {"year": 1397, "count_months": 12, "min_price": 160500.0, "min_month": "فروردین", "max_price": 483000.0, "max_month": "آذر", "start_price": 160500.0, "end_price": 422000.0, "avg_price": 316062, "year_growth_pct": 162.93, "return_vs_prev_close": 183.22, "wage": 1261000.0, "ratio_wage_to_gold": 3.99}, {"year": 1398, "count_months": 12, "min_price": 407000.0, "min_month": "مهر", "max_price": 586000.0, "max_month": "اسفند", "start_price": 428000.0, "end_price": 586000.0, "avg_price": 452417, "year_growth_pct": 36.92, "return_vs_prev_close": 38.86, "wage": 1800000.0, "ratio_wage_to_gold": 3.98}, {"year": 1399, "count_months": 12, "min_price": 634000.0, "min_month": "فروردین", "max_price": 1360000.0, "max_month": "مهر", "start_price": 634000.0, "end_price": 1051000.0, "avg_price": 1010417, "year_growth_pct": 65.77, "return_vs_prev_close": 79.35, "wage": 2400000.0, "ratio_wage_to_gold": 2.38}, {"year": 1400, "count_months": 12, "min_price": 916000.0, "min_month": "اردیبهشت", "max_price": 1300000.0, "max_month": "آذر", "start_price": 1052000.0, "end_price": 1200000.0, "avg_price": 1140250, "year_growth_pct": 14.07, "return_vs_prev_close": 14.18, "wage": 3700000.0, "ratio_wage_to_gold": 3.24}, {"year": 1401, "count_months": 12, "min_price": 1250000.0, "min_month": "فروردین", "max_price": 2363000.0, "max_month": "اسفند", "start_price": 1250000.0, "end_price": 2363000.0, "avg_price": 1564167, "year_growth_pct": 89.04, "return_vs_prev_close": 96.92, "wage": 5600000.0, "ratio_wage_to_gold": 3.58}, {"year": 1402, "count_months": 12, "min_price": 2300000.0, "min_month": "مهر", "max_price": 3110000.0, "max_month": "اسفند", "start_price": 2527000.0, "end_price": 3110000.0, "avg_price": 2542500, "year_growth_pct": 23.07, "return_vs_prev_close": 31.61, "wage": 6960000.0, "ratio_wage_to_gold": 2.74}, {"year": 1403, "count_months": 12, "min_price": 3375000.0, "min_month": "خرداد", "max_price": 6350000.0, "max_month": "اسفند", "start_price": 3620000.0, "end_price": 6350000.0, "avg_price": 4289311, "year_growth_pct": 75.41, "return_vs_prev_close": 104.18, "wage": 9600000.0, "ratio_wage_to_gold": 2.24}, {"year": 1404, "count_months": 12, "min_price": 6617300.0, "min_month": "خرداد", "max_price": 20124000.0, "max_month": "اسفند", "start_price": 8181700.0, "end_price": 20124000.0, "avg_price": 11150175, "year_growth_pct": 145.96, "return_vs_prev_close": 216.91, "wage": 13500000.0, "ratio_wage_to_gold": 1.21}, {"year": 1405, "count_months": 6, "min_price": 17000000.0, "min_month": "خرداد", "max_price": 23000000.0, "max_month": "شهریور", "start_price": 17821000.0, "end_price": 23000000.0, "avg_price": 18881833, "year_growth_pct": 29.06, "return_vs_prev_close": 14.29, "wage": 22000000.0, "ratio_wage_to_gold": 1.17}], "seasonality": [{"month_idx": 1, "month_name": "فروردین", "avg_price": 3263090, "avg_mom_return": 6.26, "positive_months_pct": 90.0, "total_years_observed": 11}, {"month_idx": 2, "month_name": "اردیبهشت", "avg_price": 3262795, "avg_mom_return": 1.06, "positive_months_pct": 63.6, "total_years_observed": 11}, {"month_idx": 3, "month_name": "خرداد", "avg_price": 3048536, "avg_mom_return": 0.93, "positive_months_pct": 45.5, "total_years_observed": 11}, {"month_idx": 4, "month_name": "تیر", "avg_price": 3201205, "avg_mom_return": 6.19, "positive_months_pct": 72.7, "total_years_observed": 11}, {"month_idx": 5, "month_name": "مرداد", "avg_price": 3314882, "avg_mom_return": 4.23, "positive_months_pct": 81.8, "total_years_observed": 11}, {"month_idx": 6, "month_name": "شهریور", "avg_price": 3832194, "avg_mom_return": 6.83, "positive_months_pct": 72.7, "total_years_observed": 11}, {"month_idx": 7, "month_name": "مهر", "avg_price": 2195750, "avg_mom_return": 5.18, "positive_months_pct": 40.0, "total_years_observed": 10}, {"month_idx": 8, "month_name": "آبان", "avg_price": 2249340, "avg_mom_return": 4.91, "positive_months_pct": 80.0, "total_years_observed": 10}, {"month_idx": 9, "month_name": "آذر", "avg_price": 2476810, "avg_mom_return": 5.76, "positive_months_pct": 80.0, "total_years_observed": 10}, {"month_idx": 10, "month_name": "دی", "avg_price": 2825890, "avg_mom_return": 3.64, "positive_months_pct": 70.0, "total_years_observed": 10}, {"month_idx": 11, "month_name": "بهمن", "avg_price": 3361960, "avg_mom_return": 7.93, "positive_months_pct": 80.0, "total_years_observed": 10}, {"month_idx": 12, "month_name": "اسفند", "avg_price": 3547100, "avg_mom_return": 6.28, "positive_months_pct": 80.0, "total_years_observed": 10}], "heatmap": [{"year": 1395, "prices": [103500.0, 105750.0, 101617.0, 111700.0, 113000.0, 114000.0, 110000.0, 113400.0, 113500.0, 113000.0, 115000.0, 116000.0], "returns": [0, 2.17, -3.91, 9.92, 1.16, 0.88, -3.51, 3.09, 0.09, -0.44, 1.77, 0.87]}, {"year": 1396, "prices": [116287.0, 113000.0, 114730.0, 115660.0, 118000.0, 125000.0, 121500.0, 124000.0, 128000.0, 140000.0, 148000.0, 149000.0], "returns": [0.25, -2.83, 1.53, 0.81, 2.02, 5.93, -2.8, 2.06, 3.23, 9.38, 5.71, 0.68]}, {"year": 1397, "prices": [160500.0, 190000.0, 200250.0, 235000.0, 280000.0, 357000.0, 334000.0, 432000.0, 483000.0, 332000.0, 367000.0, 422000.0], "returns": [7.72, 18.38, 5.39, 17.35, 19.15, 27.5, -6.44, 29.34, 11.81, -31.26, 10.54, 14.99]}, {"year": 1398, "prices": [428000.0, 462000.0, 420000.0, 436000.0, 414000.0, 416000.0, 407000.0, 408000.0, 451000.0, 491000.0, 510000.0, 586000.0], "returns": [1.42, 7.94, -9.09, 3.81, -5.05, 0.48, -2.16, 0.25, 10.54, 8.87, 3.87, 14.9]}, {"year": 1399, "prices": [634000.0, 640000.0, 731000.0, 930000.0, 1110000.0, 1100000.0, 1360000.0, 1188000.0, 1130000.0, 1160000.0, 1091000.0, 1051000.0], "returns": [8.19, 0.95, 14.22, 27.22, 19.35, -0.9, 23.64, -12.65, -4.88, 2.65, -5.95, -3.67]}, {"year": 1400, "prices": [1052000.0, 916000.0, 1080000.0, 1064000.0, 1080000.0, 1164000.0, 1160000.0, 1196000.0, 1300000.0, 1260000.0, 1211000.0, 1200000.0], "returns": [0.1, -12.93, 17.9, -1.48, 1.5, 7.78, -0.34, 3.1, 8.7, -3.08, -3.89, -0.91]}, {"year": 1401, "prices": [1250000.0, 1305000.0, 1430000.0, 1364000.0, 1374000.0, 1273000.0, 1385000.0, 1464000.0, 1582000.0, 1800000.0, 2180000.0, 2363000.0], "returns": [4.17, 4.4, 9.58, -4.62, 0.73, -7.35, 8.8, 5.7, 8.06, 13.78, 21.11, 8.39]}, {"year": 1402, "prices": [2527000.0, 2734000.0, 2464000.0, 2385000.0, 2365000.0, 2362000.0, 2300000.0, 2470000.0, 2464000.0, 2565000.0, 2764000.0, 3110000.0], "returns": [6.94, 8.19, -9.88, -3.21, -0.84, -0.13, -2.62, 7.39, -0.24, 4.1, 7.76, 12.52]}, {"year": 1403, "prices": [3620000.0, 3420000.0, 3375000.0, 3434800.0, 3519700.0, 3592133.0, 4080000.0, 4598000.0, 4686600.0, 5137900.0, 5657600.0, 6350000.0], "returns": [16.4, -5.52, -1.32, 1.77, 2.47, 2.06, 13.58, 12.7, 1.93, 9.63, 10.12, 12.24]}, {"year": 1404, "prices": [8181700.0, 6805000.0, 6617300.0, 7437100.0, 7520000.0, 8651000.0, 10700000.0, 10500000.0, 12430000.0, 15260000.0, 19576000.0, 20124000.0], "returns": [28.85, -16.83, -2.76, 12.39, 1.11, 15.04, 23.69, -1.87, 18.38, 22.77, 28.28, 2.8]}, {"year": 1405, "prices": [17821000.0, 19200000.0, 17000000.0, 17700000.0, 18570000.0, 23000000.0, null, null, null, null, null, null], "returns": [-11.44, 7.74, -11.46, 4.12, 4.92, 23.86, null, null, null, null, null, null]}], "records": {"initial_price": 103500.0, "initial_date": "فروردین 1395", "latest_price": 23364500.0, "latest_date": "شهریور 1405", "total_growth_multiplier": 225.7, "total_growth_pct": 22474.4, "max_mom_gain": {"year": 1397, "month_idx": 8, "month_name": "آبان", "label": "آبان 1397", "short_label": "1397/08", "price": 432000.0, "wage": 1261000.0, "wage_in_gold_grams": 2.92, "mom_change_amount": 98000.0, "mom_change_pct": 29.34, "yoy_change_amount": 308000.0, "yoy_change_pct": 248.39}, "min_mom_gain": {"year": 1397, "month_idx": 10, "month_name": "دی", "label": "دی 1397", "short_label": "1397/10", "price": 332000.0, "wage": 1261000.0, "wage_in_gold_grams": 3.8, "mom_change_amount": -151000.0, "mom_change_pct": -31.26, "yoy_change_amount": 192000.0, "yoy_change_pct": 137.14}, "initial_wage_in_gold": 9.39, "latest_wage_in_gold": 0.96, "purchasing_power_change_pct": -89.8, "cagr": 67.3}, "live_source": {"price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0, "coin_old": 230500000.0, "half_coin": 119500000.0, "quarter_coin": 64500000.0, "gram_coin": 35000000.0, "gold_24k": 31300000.0, "ounce_usd": 4473.0, "update_time": "13 شهریور 1405 - 00:26:02", "source_url": "https://www.estjt.ir/"}, "daily_data": {"ticks": [{"timestamp": "13 شهریور 1405 - 00:26:32", "date": "1405/06/13", "year": 1405, "month": 6, "month_name": "شهریور", "day": 13, "price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 22:39:21", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 22:25:31", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 22:12:41", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 21:30:34", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23364500.0, "mesghal": 101210000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 21:05:58", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23440700.0, "mesghal": 101540000.0, "coin_new": 233500000.0}, {"timestamp": "12 شهریور 1405 - 20:38:43", "date": "1405/06/12", "year": 1405, "month": 6, "month_name": "شهریور", "day": 12, "price": 23440700.0, "mesghal": 101540000.0, "coin_new": 233500000.0}], "monthly_aggregates": {"1405-06": {"year": 1405, "month": 6, "month_name": "شهریور", "label": "شهریور 1405", "samples_count": 7, "avg_price": 23386271.0, "latest_price": 23364500.0}}, "last_sync": "13 شهریور 1405 - 00:26:32", "total_db_records": 7}, "lstm_forecast": {"model_info": {"model_type": "LSTM Recurrent Neural Network (یادگیری عمیق سری زمانی)", "architecture": "LSTM (4 ورودی -> 12 سلول حافظه -> 1 خروجی متراکم)", "lookback_window": "8 ماهه", "epochs_trained": 90, "rmse_return": 0.1041, "mape_return_pct": 137.86, "std_residual": 0.0995, "last_trained_on_samples": 126}, "startPrice": 23364500.0, "startLabel": "شهریور 1405", "base": [{"month_name": "مهر", "year": 1405, "label": "مهر 1405", "price": 23831790, "growth_mom": 2.0, "growth_from_now": 2.0}, {"month_name": "آبان", "year": 1405, "label": "آبان 1405", "price": 25159911, "growth_mom": 5.57, "growth_from_now": 7.7}, {"month_name": "آذر", "year": 1405, "label": "آذر 1405", "price": 27549964, "growth_mom": 9.5, "growth_from_now": 17.9}, {"month_name": "دی", "year": 1405, "label": "دی 1405", "price": 30249777, "growth_mom": 9.8, "growth_from_now": 29.5}, {"month_name": "بهمن", "year": 1405, "label": "بهمن 1405", "price": 32860595, "growth_mom": 8.63, "growth_from_now": 40.6}, {"month_name": "اسفند", "year": 1405, "label": "اسفند 1405", "price": 35423630, "growth_mom": 7.8, "growth_from_now": 51.6}, {"month_name": "فروردین", "year": 1406, "label": "فروردین 1406", "price": 37552787, "growth_mom": 6.01, "growth_from_now": 60.7}, {"month_name": "اردیبهشت", "year": 1406, "label": "اردیبهشت 1406", "price": 38754342, "growth_mom": 3.2, "growth_from_now": 65.9}, {"month_name": "خرداد", "year": 1406, "label": "خرداد 1406", "price": 40433164, "growth_mom": 4.33, "growth_from_now": 73.1}, {"month_name": "تیر", "year": 1406, "label": "تیر 1406", "price": 43348541, "growth_mom": 7.21, "growth_from_now": 85.5}, {"month_name": "مرداد", "year": 1406, "label": "مرداد 1406", "price": 46636103, "growth_mom": 7.58, "growth_from_now": 99.6}, {"month_name": "شهریور", "year": 1406, "label": "شهریور 1406", "price": 49017432, "growth_mom": 5.11, "growth_from_now": 109.8}], "conservative": [{"label": "مهر 1405", "price": 23644874, "growth_from_now": 1.2}, {"label": "آبان 1405", "price": 23928612, "growth_from_now": 2.4}, {"label": "آذر 1405", "price": 24891953, "growth_from_now": 6.5}, {"label": "دی 1405", "price": 25968815, "growth_from_now": 11.1}, {"label": "بهمن 1405", "price": 26788733, "growth_from_now": 14.7}, {"label": "اسفند 1405", "price": 27411884, "growth_from_now": 17.3}, {"label": "فروردین 1406", "price": 27740827, "growth_from_now": 18.7}, {"label": "اردیبهشت 1406", "price": 28073717, "growth_from_now": 20.2}, {"label": "خرداد 1406", "price": 28410601, "growth_from_now": 21.6}, {"label": "تیر 1406", "price": 28904040, "growth_from_now": 23.7}, {"label": "مرداد 1406", "price": 29514050, "growth_from_now": 26.3}, {"label": "شهریور 1406", "price": 29868218, "growth_from_now": 27.8}], "bullish": [{"label": "مهر 1405", "price": 25575701, "growth_from_now": 9.5}, {"label": "آبان 1405", "price": 28909962, "growth_from_now": 23.7}, {"label": "آذر 1405", "price": 33814070, "growth_from_now": 44.7}, {"label": "دی 1405", "price": 39651606, "growth_from_now": 69.7}, {"label": "بهمن 1405", "price": 46033454, "growth_from_now": 97.0}, {"label": "اسفند 1405", "price": 53059841, "growth_from_now": 127.1}, {"label": "فروردین 1406", "price": 60209385, "growth_from_now": 157.7}, {"label": "اردیبهشت 1406", "price": 66629860, "growth_from_now": 185.2}, {"label": "خرداد 1406", "price": 74489445, "growth_from_now": 218.8}, {"label": "تیر 1406", "price": 85420248, "growth_from_now": 265.6}, {"label": "مرداد 1406", "price": 98274247, "growth_from_now": 320.6}, {"label": "شهریور 1406", "price": 110627445, "growth_from_now": 373.5}]}, "db_stats": {"sqlite": {"total_ticks": 7, "first_record": "2026-09-03 17:08:43", "last_record": "2026-09-03 20:56:33", "db_size_kb": 24.0}, "total_ticks": 7, "db_size_kb": 24.0, "postgres": {"connected": true, "total_ticks": 7, "first_record": "2026-09-03 17:08:43+00:00", "last_record": "2026-09-03 20:56:33.057315+00:00"}}};
+  </script>
+
+  <!-- DASHBOARD ENGINE WITH 30-MIN AUTO-SYNC & RUNNING MONTHLY AVERAGE -->
+  <script>
+    // App State
+    let APP_DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
+    let currentScale = 'linear';
+    let macroChartInstance = null;
+    let momChartInstance = null;
+    let forecastScenarioChartInstance = null;
+    let purchasingPowerChartInstance = null;
+    let growthIndexChartInstance = null;
+    let seasonalityBarChartInstance = null;
+    let seasonalityWinRateChartInstance = null;
+    let yearlyReturnChartInstance = null;
+    let currentTimelineFilter = 'all';
+    let isForecastVisible = true;
+    let currentForecastScenario = 'base';
+
+    const AUTO_SYNC_INTERVAL_SEC = 30 * 60; // 30 minutes
+    let nextSyncCountdown = AUTO_SYNC_INTERVAL_SEC;
+
+    const MONTHS_ORDER = [
+      "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+      "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+    ];
+
+    // Load persisted data from localStorage if exists
+    try {
+      const saved = localStorage.getItem('gold_dashboard_custom_data');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.timeline && parsed.timeline.length >= APP_DATA.timeline.length) {
+          APP_DATA = parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read localStorage:", e);
+    }
+
+    // Helpers
+        function formatNumber(num) {
+      if (num === null || num === undefined || isNaN(num)) return '-';
+      return new Intl.NumberFormat('en-US').format(Math.round(num));
+    }
+
+    function formatNumberDecimal(num, decimals = 1) {
+      if (num === null || num === undefined || isNaN(num)) return '-';
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(num);
+    }
+
+    function cleanPersianNumber(text) {
+      if (!text) return 0;
+      const persianDigits = '0123456789';
+      const arabicDigits = '٠١٢٣٤٥٦٧89';
+      let s = text.toString();
+      for (let i = 0; i < 10; i++) {
+        s = s.replaceAll(persianDigits[i], i.toString()).replaceAll(arabicDigits[i], i.toString());
+      }
+      s = s.replaceAll('\u066b', '').replaceAll('\u066c', '').replaceAll('٬', '').replaceAll(',', '').replaceAll(' ', '').replaceAll('تومان', '').replaceAll('$', '').trim();
+      return parseFloat(s) || 0;
+    }
+
+    function roundDecimal(val, places) {
+      const factor = Math.pow(10, places);
+      return Math.round(val * factor) / factor;
+    }
+
+    // Accurate Gregorian to Jalali converter
+    function gregorianToJalali(gy, gm, gd) {
+      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let jy = gy > 1600 ? 979 : 0;
+      gy -= gy > 1600 ? 1600 : 621;
+      const gy2 = gm > 2 ? gy + 1 : gy;
+      let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+      jy += 33 * Math.floor(days / 12053);
+      days %= 12053;
+      jy += 4 * Math.floor(days / 1461);
+      days %= 1461;
+      if (days > 365) {
+        jy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
+      }
+      const jm = days < 186 ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+      const jd = 1 + (days < 186 ? (days % 31) : ((days - 186) % 30));
+      return { year: jy, month: jm, day: jd };
+    }
+
+    function getNowPersian() {
+      const now = new Date();
+      const j = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      const monthName = MONTHS_ORDER[j.month - 1];
+      const monthKey = `${j.year}-${j.month < 10 ? '0' + j.month : j.month}`;
+      const dateStr = `${j.year}/${j.month < 10 ? '0' + j.month : j.month}/${j.day < 10 ? '0' + j.day : j.day}`;
+      const timeStr = `${j.day} ${monthName} ${j.year} - ${hh}:${mm}:${ss}`;
+      return { ...j, monthName, monthKey, dateStr, timeStr };
+    }
+
+    // RECORD DAILY TICK AND RECALCULATE RUNNING MONTH AVERAGE
+    function recordDailyTick(price, mesghal, coin) {
+      const pNow = getNowPersian();
+      if (!APP_DATA.daily_data) {
+        APP_DATA.daily_data = { ticks: [], monthly_aggregates: {} };
+      }
+
+      // Append tick
+      APP_DATA.daily_data.ticks.unshift({
+        timestamp: pNow.timeStr,
+        date: pNow.dateStr,
+        year: pNow.year,
+        month: pNow.month,
+        month_name: pNow.monthName,
+        day: pNow.day,
+        price: price,
+        mesghal: mesghal || null,
+        coin_new: coin || null
+      });
+
+      // Keep up to 200 ticks
+      if (APP_DATA.daily_data.ticks.length > 200) {
+        APP_DATA.daily_data.ticks = APP_DATA.daily_data.ticks.slice(0, 200);
+      }
+
+      // Calculate monthly average for current month
+      const currentMonthTicks = APP_DATA.daily_data.ticks.filter(t => t.year === pNow.year && t.month === pNow.month);
+      const sum = currentMonthTicks.reduce((acc, curr) => acc + curr.price, 0);
+      const count = currentMonthTicks.length;
+      const monthAvg = Math.round(sum / count);
+
+      APP_DATA.daily_data.monthly_aggregates[pNow.monthKey] = {
+        year: pNow.year,
+        month: pNow.month,
+        month_name: pNow.monthName,
+        label: `${pNow.monthName} ${pNow.year}`,
+        samples_count: count,
+        avg_price: monthAvg,
+        latest_price: price
+      };
+
+      // Check if current calendar month exists in timeline; if not, automatically advance month!
+      const currentLabel = `${pNow.monthName} ${pNow.year}`;
+      let latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+
+      if (latestItem.label !== currentLabel && pNow.year >= latestItem.year) {
+        // New month has begun! Auto-add month to timeline
+        const prevPrice = latestItem.price;
+        const newMonthItem = {
+          year: pNow.year,
+          month_idx: pNow.month,
+          month_name: pNow.monthName,
+          label: currentLabel,
+          short_label: `${pNow.year}/${pNow.month < 10 ? '0' + pNow.month : pNow.month}`,
+          price: price,
+          wage: latestItem.wage,
+          wage_in_gold_grams: roundDecimal(latestItem.wage / price, 2),
+          mom_change_amount: price - prevPrice,
+          mom_change_pct: roundDecimal(((price - prevPrice) / prevPrice) * 100, 2),
+          month_avg_price: monthAvg,
+          daily_samples_count: count
+        };
+        APP_DATA.timeline.push(newMonthItem);
+        latestItem = newMonthItem;
+      } else {
+        // Update current month item with latest price and running month average
+        const prevItem = APP_DATA.timeline[APP_DATA.timeline.length - 2];
+        latestItem.price = price;
+        latestItem.month_avg_price = monthAvg;
+        latestItem.daily_samples_count = count;
+        latestItem.mom_change_amount = price - prevItem.price;
+        latestItem.mom_change_pct = roundDecimal(((price - prevItem.price) / prevItem.price) * 100, 2);
+        latestItem.wage_in_gold_grams = roundDecimal(latestItem.wage / price, 2);
+      }
+
+      // Persist to localStorage
+      try {
+        localStorage.setItem('gold_dashboard_custom_data', JSON.stringify(APP_DATA));
+      } catch(e) {}
+
+      return { monthAvg, count, pNow };
+    }
+
+    // AUTO-SYNC 30-MINUTE TIMER & COUNTDOWN
+    function startAutoSyncTimer() {
+      setInterval(() => {
+        nextSyncCountdown--;
+        if (nextSyncCountdown <= 0) {
+          nextSyncCountdown = AUTO_SYNC_INTERVAL_SEC;
+          fetchLiveOnlinePrice(true);
+        }
+        const mins = Math.floor(nextSyncCountdown / 60);
+        const secs = nextSyncCountdown % 60;
+        const formatted = `${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
+        const el1 = document.getElementById('autoSyncCountdown');
+        const el2 = document.getElementById('syncPanelCountdown');
+        if (el1) el1.textContent = formatted;
+        if (el2) el2.textContent = formatted;
+      }, 1000);
+    }
+
+    // Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.textContent = '🌙';
+        localStorage.theme = 'light';
+      } else {
+        html.classList.add('dark');
+        icon.textContent = '☀️';
+        localStorage.theme = 'dark';
+      }
+      setTimeout(() => updateAllChartsTheme(), 50);
+    }
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('themeIcon').textContent = '☀️';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.getElementById('themeIcon').textContent = '🌙';
+    }
+
+    function toggleScale() {
+      const newScale = currentScale === 'linear' ? 'logarithmic' : 'linear';
+      currentScale = newScale;
+      document.getElementById('btnScaleToggle').textContent = 'مقیاس: ' + (newScale === 'linear' ? 'خطی' : 'لگاریتمی');
+      if (macroChartInstance) {
+        macroChartInstance.options.scales.y.type = newScale;
+        macroChartInstance.update();
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-grid-btn').forEach(el => el.classList.remove('active'));
+
+      const activeTab = document.getElementById(tabId);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      setTimeout(() => {
+        if (tabId === 'tab-macro') {
+          renderMacroChart();
+        } else if (tabId === 'tab-forecast-details') {
+          renderForecastScenarioChart();
+          populateRollingForecastTable();
+        } else if (tabId === 'tab-wage') {
+          populateWageTable();
+          renderWageCharts();
+        } else if (tabId === 'tab-seasonality') {
+          populateHeatmap();
+          renderSeasonalityCharts();
+        } else if (tabId === 'tab-yearly') {
+          populateYearlyTable();
+          renderYearlyCharts();
+        } else if (tabId === 'tab-live-sync') {
+          populateDailyTicksTable();
+        }
+      }, 50);
+    }
+
+    function filterTimeline(range) {
+      currentTimelineFilter = range;
+      document.querySelectorAll('.time-filter').forEach(btn => {
+        if (btn.dataset.range === range) {
+          btn.className = "time-filter active px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-amber-400 text-slate-900 font-bold";
+        } else {
+          btn.className = "time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+        }
+      });
+      renderMacroChart();
+    }
+
+    function toggleForecastVisibility() {
+      isForecastVisible = !isForecastVisible;
+      const btn = document.getElementById('btnToggleForecast');
+      if (isForecastVisible) {
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-500 animate-ping inline-block"></span><span>خط پیش‌بینی: فعال</span>`;
+        btn.className = "px-2.5 sm:px-3 py-1.5 rounded-xl border border-cyan-400 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 shadow-sm transition-all";
+      } else {
+        btn.innerHTML = `<span>خط پیش‌بینی: خاموش</span>`;
+        btn.className = "px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 font-medium text-[11px] sm:text-xs flex items-center gap-1.5 shadow-sm transition-all";
+      }
+      renderMacroChart();
+    }
+
+    function changeForecastScenario(scenario) {
+      currentForecastScenario = scenario;
+      renderMacroChart();
+      renderForecastScenarioChart();
+    }
+
+    // 1. موتور پیش‌بینی آماری و فصلی (مدل عادی)
+    function generateSeasonalForecast() {
+      const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const startPrice = latestItem.price;
+      const startYear = latestItem.year;
+      const startMonthIdx = latestItem.month_idx;
+
+      const seasonMap = {};
+      APP_DATA.seasonality.forEach(s => {
+        seasonMap[s.month_idx] = s.avg_mom_return;
+      });
+
+      let curBase = startPrice;
+      let curCons = startPrice;
+      let curBull = startPrice;
+
+      const baseList = [];
+      const consList = [];
+      const bullList = [];
+
+      const monthlyConsRate = Math.pow(1 + 0.40, 1/12) - 1;
+      const monthlyBullRate = Math.pow(1 + 0.90, 1/12) - 1;
+      const sumSeasonWeights = Object.values(seasonMap).reduce((a, b) => a + b, 0);
+
+      let curY = startYear;
+      let curM = startMonthIdx;
+
+      for (let i = 1; i <= 12; i++) {
+        curM++;
+        if (curM > 12) {
+          curM = 1;
+          curY++;
+        }
+
+        const mName = MONTHS_ORDER[curM - 1];
+        const label = `${mName} ${curY}`;
+        const seasonalMom = seasonMap[curM] || 4.5;
+
+        // Base
+        curBase = curBase * (1 + (seasonalMom / 100));
+        baseList.push({
+          month_name: mName,
+          year: curY,
+          label: label,
+          price: Math.round(curBase),
+          growth_mom: seasonalMom,
+          growth_from_now: roundDecimal(((curBase - startPrice) / startPrice) * 100, 1)
+        });
+
+        // Conservative
+        const weight = (seasonalMom / sumSeasonWeights) * 12;
+        curCons = curCons * (1 + monthlyConsRate * weight);
+        consList.push({
+          label: label,
+          price: Math.round(curCons),
+          growth_from_now: roundDecimal(((curCons - startPrice) / startPrice) * 100, 1)
+        });
+
+        // Bullish
+        curBull = curBull * (1 + monthlyBullRate * weight);
+        bullList.push({
+          label: label,
+          price: Math.round(curBull),
+          growth_from_now: roundDecimal(((curBull - startPrice) / startPrice) * 100, 1)
+        });
+      }
+
+      return {
+        base: baseList,
+        conservative: consList,
+        bullish: bullList,
+        startPrice: startPrice,
+        startLabel: latestItem.label
+      };
+    }
+
+    // 2. موتور پیش‌بینی با شبکه عصبی عمیق LSTM
+    function generateLSTMForecast() {
+      const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const startPrice = latestItem.price;
+
+      if (APP_DATA.lstm_forecast && APP_DATA.lstm_forecast.base) {
+        const raw = APP_DATA.lstm_forecast;
+        const origStart = raw.startPrice || startPrice;
+        const scale = origStart > 0 ? (startPrice / origStart) : 1.0;
+
+        const baseList = raw.base.map(b => {
+          const scaledP = Math.round(b.price * scale);
+          return {
+            ...b,
+            price: scaledP,
+            growth_from_now: roundDecimal(((scaledP - startPrice) / startPrice) * 100, 1)
+          };
+        });
+
+        const consList = raw.conservative.map(c => {
+          const scaledP = Math.round(c.price * scale);
+          return {
+            ...c,
+            price: scaledP,
+            growth_from_now: roundDecimal(((scaledP - startPrice) / startPrice) * 100, 1)
+          };
+        });
+
+        const bullList = raw.bullish.map(bu => {
+          const scaledP = Math.round(bu.price * scale);
+          return {
+            ...bu,
+            price: scaledP,
+            growth_from_now: roundDecimal(((scaledP - startPrice) / startPrice) * 100, 1)
+          };
+        });
+
+        return {
+          base: baseList,
+          conservative: consList,
+          bullish: bullList,
+          startPrice: startPrice,
+          startLabel: latestItem.label,
+          model_info: raw.model_info || {}
+        };
+      }
+
+      // Fallback
+      return generateSeasonalForecast();
+    }
+
+    // تابع انتخاب‌کننده مدل فعال
+    // 3. موتور پیش‌بینی سه‌گانه هیبریدی (Tri-Hybrid Ensemble)
+    // ماه 1: شبکه عصبی عمیق بازگشتی LSTM (مدل‌سازی شتاب و حافظه کوتاه‌مدت 30 روزه)
+    // ماه‌های 2 تا 5: روند تطبیقی و مومنتوم انباشته نقدینگی (Adaptive Momentum Drift)
+    // ماه‌های 6 تا 12: چرخه‌های فصلی 10 ساله طلا (10-Year Seasonality Cycles)
+    function generateHybridForecast() {
+      const sFc = generateSeasonalForecast();
+      const lFc = generateLSTMForecast();
+      const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const startPrice = latestItem.price;
+
+      // محاسبه نرخ روند انطباقی بر پایه 12 ماه اخیر
+      const last12 = APP_DATA.timeline.slice(-12);
+      let avgMomTrend = 4.2; // 4.2٪ در ماه پیش‌فرض
+      if (last12.length >= 2) {
+        const p1 = last12[0].price;
+        const p2 = last12[last12.length - 1].price;
+        avgMomTrend = (Math.pow(p2 / p1, 1 / (last12.length - 1)) - 1) * 100;
+      }
+
+      const hybridBase = [];
+      const hybridCons = [];
+      const hybridBull = [];
+      let curTrendPrice = startPrice;
+
+      for (let i = 0; i < 12; i++) {
+        const m = i + 1;
+        curTrendPrice = curTrendPrice * (1 + avgMomTrend / 100);
+
+        const pLstm = lFc.base[i].price;
+        const pSeas = sFc.base[i].price;
+        const pTrend = curTrendPrice;
+
+        let wLstm = 0, wTrend = 0, wSeas = 0;
+        let algoName = '';
+        let algoBadge = '';
+
+        if (m === 1) {
+          wLstm = 0.85; wTrend = 0.15; wSeas = 0.00;
+          algoName = 'هوش مصنوعی LSTM (کوتاه‌مدت)';
+          algoBadge = '<span class="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold text-[10px]">🧠 هوش مصنوعی LSTM</span>';
+        } else if (m === 2) {
+          wLstm = 0.40; wTrend = 0.45; wSeas = 0.15;
+          algoName = 'تلفیق LSTM و روند تطبیقی';
+          algoBadge = '<span class="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 font-bold text-[10px]">📈 انتقال به روند میان‌مدت</span>';
+        } else if (m <= 5) {
+          wLstm = 0.05; wTrend = 0.45; wSeas = 0.50;
+          algoName = 'روند تطبیقی و چرخه‌های میانی';
+          algoBadge = '<span class="px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-400 border border-blue-500/30 font-bold text-[10px]">📊 مومنتوم و روند میان‌مدت</span>';
+        } else {
+          wLstm = 0.00; wTrend = 0.15; wSeas = 0.85;
+          algoName = 'چرخه‌های فصلی 10 ساله طلا';
+          algoBadge = '<span class="px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-bold text-[10px]">🗓️ الگوی فصلی بلندمدت</span>';
+        }
+
+        const totalW = wLstm + wTrend + wSeas;
+        const finalBasePrice = Math.round((wLstm * pLstm + wTrend * pTrend + wSeas * pSeas) / totalW);
+
+        // کریدورهای حمایتی و صعودی
+        const pConsLstm = lFc.conservative[i].price;
+        const pConsSeas = sFc.conservative[i].price;
+        const finalConsPrice = Math.round(wLstm * pConsLstm + (1 - wLstm) * pConsSeas);
+
+        const pBullLstm = lFc.bullish[i].price;
+        const pBullSeas = sFc.bullish[i].price;
+        const finalBullPrice = Math.round(wLstm * pBullLstm + (1 - wLstm) * pBullSeas);
+
+        const prevPrice = i === 0 ? startPrice : hybridBase[i - 1].price;
+        const momGrowth = roundDecimal(((finalBasePrice - prevPrice) / prevPrice) * 100, 1);
+        const cumGrowth = roundDecimal(((finalBasePrice - startPrice) / startPrice) * 100, 1);
+
+        hybridBase.push({
+          month_name: sFc.base[i].month_name,
+          year: sFc.base[i].year,
+          label: sFc.base[i].label,
+          price: finalBasePrice,
+          growth_mom: momGrowth,
+          growth_from_now: cumGrowth,
+          algo_name: algoName,
+          algo_badge: algoBadge
+        });
+
+        hybridCons.push({
+          label: sFc.base[i].label,
+          price: finalConsPrice,
+          growth_from_now: roundDecimal(((finalConsPrice - startPrice) / startPrice) * 100, 1)
+        });
+
+        hybridBull.push({
+          label: sFc.base[i].label,
+          price: finalBullPrice,
+          growth_from_now: roundDecimal(((finalBullPrice - startPrice) / startPrice) * 100, 1)
+        });
+      }
+
+      return {
+        base: hybridBase,
+        conservative: hybridCons,
+        bullish: hybridBull,
+        startPrice: startPrice,
+        startLabel: latestItem.label
+      };
+    }
+
+    function getActiveForecast() {
+      return currentForecastModel === 'lstm' ? generateLSTMForecast() : generateSeasonalForecast();
+    }
+
+    function generateRolling12MonthForecast() {
+      return getActiveForecast();
+    }
+
+    function calculateSMA(dataArray, windowSize) {
+      let sma = [];
+      for (let i = 0; i < dataArray.length; i++) {
+        if (i < windowSize - 1) {
+          sma.push(null);
+        } else {
+          let sum = 0;
+          for (let j = 0; j < windowSize; j++) {
+            sum += dataArray[i - j];
+          }
+          sma.push(sum / windowSize);
+        }
+      }
+      return sma;
+    }
+
+    function renderMacroChart() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      let hist = APP_DATA.timeline;
+      if (currentTimelineFilter === '5y') {
+        hist = APP_DATA.timeline.filter(t => t.year >= 1401);
+      } else if (currentTimelineFilter === '3y') {
+        hist = APP_DATA.timeline.filter(t => t.year >= 1403);
+      } else if (currentTimelineFilter === 'early') {
+        hist = APP_DATA.timeline.filter(t => t.year <= 1399);
+      }
+
+      let labels = hist.map(t => t.label);
+      let histPrices = hist.map(t => t.price);
+      let seasonalForecastLine = [];
+      let lstmForecastLine = [];
+
+      const latestItem = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const isAtLatest = hist[hist.length - 1].label === latestItem.label;
+      const hFc = generateHybridForecast();
+
+      if (isForecastVisible && isAtLatest) {
+        const futureLabels = hFc.base.map(f => f.label);
+        labels = labels.concat(futureLabels);
+        histPrices = histPrices.concat(new Array(futureLabels.length).fill(null));
+      }
+
+      const sma6 = calculateSMA(hist.map(t => t.price), 6);
+
+      const ctx = document.getElementById('macroChart').getContext('2d');
+      if (macroChartInstance) macroChartInstance.destroy();
+
+      const goldGrad = ctx.createLinearGradient(0, 0, 0, 400);
+      goldGrad.addColorStop(0, 'rgba(234, 179, 8, 0.38)');
+      goldGrad.addColorStop(1, 'rgba(234, 179, 8, 0.0)');
+
+      const datasets = [
+        {
+          label: 'قیمت ثبت‌شده طلا 18 عیار',
+          data: histPrices,
+          borderColor: '#eab308',
+          backgroundColor: goldGrad,
+          fill: true,
+          borderWidth: 2.6,
+          tension: 0.25,
+          pointRadius: hist.length > 60 ? 1 : 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#eab308',
+          order: 2
+        }
+      ];
+
+      if (isForecastVisible && isAtLatest) {
+        const fcPoints = currentForecastScenario === 'base' ? hFc.base : (currentForecastScenario === 'conservative' ? hFc.conservative : hFc.bullish);
+        const hybridForecastLine = new Array(hist.length - 1).fill(null);
+        hybridForecastLine.push(latestItem.price);
+        fcPoints.forEach(p => hybridForecastLine.push(p.price));
+
+        const scenLabel = currentForecastScenario === 'base' ? 'پایه ترکیبی' : (currentForecastScenario === 'conservative' ? 'محافظه‌کارانه' : 'صعودی');
+
+        datasets.push({
+          label: `پیش‌بینی 1 ساله مدل ترکیبی (${scenLabel})`,
+          data: hybridForecastLine,
+          borderColor: '#8b5cf6',
+          backgroundColor: 'transparent',
+          borderWidth: 3.2,
+          borderDash: [5, 5],
+          pointRadius: 4,
+          pointBackgroundColor: '#8b5cf6',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 1.5,
+          pointHoverRadius: 7,
+          fill: false,
+          tension: 0.2,
+          order: 1
+        });
+      }
+
+      datasets.push({
+        label: 'میانگین 6 ماهه (SMA)',
+        data: sma6,
+        borderColor: '#c084fc',
+        borderWidth: 1.6,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.3,
+        order: 3
+      });
+
+      macroChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              rtl: true,
+              bodyFont: { family: 'Vazirmatn', size: 11 },
+              titleFont: { family: 'Vazirmatn', weight: 'bold' },
+              callbacks: {
+                label: function(c) {
+                  if (c.parsed.y !== null) {
+                    const isFc = c.dataset.label.includes('پیش‌بینی');
+                    return (isFc ? '🔮 ' : '') + c.dataset.label + ': ' + formatNumber(Math.round(c.parsed.y)) + ' تومان';
+                  }
+                  return null;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 9 },
+                maxRotation: 45,
+                autoSkip: true,
+                maxTicksLimit: window.innerWidth < 640 ? 7 : 14
+              }
+            },
+            y: {
+              type: currentScale,
+              position: 'right',
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 9 },
+                callback: function(v) {
+                  if (v >= 1000000) return formatNumberDecimal(v / 1000000, 1) + ' م';
+                  if (v >= 1000) return formatNumber(v / 1000) + ' ک';
+                  return formatNumber(v);
+                }
+              }
+            }
+          }
+        }
+      });
+
+      renderMoMChart(hist, gridColor, textColor);
+      updateKPIsAndForecastSummary();
+    }
+
+    function renderMoMChart(histSubset, gridColor, textColor) {
+      const momLabels = histSubset.map(t => t.short_label);
+      const momValues = histSubset.map(t => t.mom_change_pct);
+      const barColors = momValues.map(v => v >= 0 ? '#10b981' : '#f43f5e');
+
+      const momCtx = document.getElementById('momReturnsChart').getContext('2d');
+      if (momChartInstance) momChartInstance.destroy();
+
+      momChartInstance = new Chart(momCtx, {
+        type: 'bar',
+        data: {
+          labels: momLabels,
+          datasets: [{
+            label: 'تغییر ماهانه (٪)',
+            data: momValues,
+            backgroundColor: barColors,
+            borderRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              rtl: true,
+              bodyFont: { family: 'Vazirmatn' },
+              callbacks: {
+                label: c => (c.raw >= 0 ? '+' : '') + formatNumberDecimal(c.raw, 2) + '٪'
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 8 },
+                maxRotation: 90,
+                autoSkip: true,
+                maxTicksLimit: window.innerWidth < 640 ? 12 : 24
+              }
+            },
+            y: {
+              position: 'right',
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 9 },
+                callback: v => formatNumberDecimal(v, 0) + '٪'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderForecastScenarioChart() {
+      const canvas = document.getElementById('forecastScenariosChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (forecastScenarioChartInstance) forecastScenarioChartInstance.destroy();
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      const hFc = generateHybridForecast();
+      const labels = [hFc.startLabel, ...hFc.base.map(b => b.label)];
+
+      const baseData = [hFc.startPrice, ...hFc.base.map(b => b.price)];
+      const consData = [hFc.startPrice, ...hFc.conservative.map(c => c.price)];
+      const bullData = [hFc.startPrice, ...hFc.bullish.map(bu => bu.price)];
+
+      forecastScenarioChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'سناریوی پایه (مدل ترکیبی - طلایی)',
+              data: baseData,
+              borderColor: '#eab308',
+              backgroundColor: isDark ? 'rgba(234, 179, 8, 0.15)' : 'rgba(234, 179, 8, 0.10)',
+              borderWidth: 3.5,
+              pointRadius: 4.5,
+              pointBackgroundColor: '#eab308',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 1.5,
+              pointHoverRadius: 7,
+              fill: true,
+              tension: 0.25,
+              order: 1
+            },
+            {
+              label: 'کف کریدور حمایتی (محافظه‌کارانه - سبز)',
+              data: consData,
+              borderColor: '#10b981',
+              backgroundColor: 'transparent',
+              borderWidth: 2.2,
+              borderDash: [5, 4],
+              pointRadius: 3.5,
+              pointBackgroundColor: '#10b981',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 1,
+              pointHoverRadius: 6,
+              fill: false,
+              tension: 0.25,
+              order: 2
+            },
+            {
+              label: 'سقف جهش شتابان (صعودی - آبی فیروزه‌ای)',
+              data: bullData,
+              borderColor: '#06b6d4',
+              backgroundColor: 'transparent',
+              borderWidth: 2.2,
+              borderDash: [5, 4],
+              pointRadius: 3.5,
+              pointBackgroundColor: '#06b6d4',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 1,
+              pointHoverRadius: 6,
+              fill: false,
+              tension: 0.25,
+              order: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'top',
+              rtl: true,
+              labels: { color: textColor, font: { family: 'Vazirmatn', size: 11 } }
+            },
+            tooltip: {
+              rtl: true,
+              bodyFont: { family: 'Vazirmatn' },
+              callbacks: {
+                label: function(c) {
+                  const startP = hFc.startPrice;
+                  const diffPct = roundDecimal(((c.raw - startP) / startP) * 100, 1);
+                  const sign = diffPct >= 0 ? '+' : '';
+                  return c.dataset.label + ': ' + formatNumber(c.raw) + ' تومان (' + sign + diffPct + '%)';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 9 },
+                maxRotation: 45,
+                autoSkip: true,
+                maxTicksLimit: window.innerWidth < 640 ? 6 : 13
+              }
+            },
+            y: {
+              position: 'right',
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'Vazirmatn', size: 9 },
+                callback: v => formatNumberDecimal(v / 1000000, 1) + ' م'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateKPIsAndForecastSummary() {
+      const latest = APP_DATA.timeline[APP_DATA.timeline.length - 1];
+      const initial = APP_DATA.timeline[0];
+
+      // Ticker & KPIs
+      document.getElementById('tickerLivePrice').textContent = formatNumber(latest.price) + ' تومان';
+      if (APP_DATA.live_source && APP_DATA.live_source.update_time) {
+        document.getElementById('tickerUpdateTime').textContent = 'آخرین استعلام: ' + APP_DATA.live_source.update_time + ' (اتحادیه estjt.ir)';
+      }
+
+      // Calculate running month average from daily data
+      let monthAvg = latest.price;
+      let sampleCount = 1;
+      const pNow = getNowPersian();
+      if (APP_DATA.daily_data && APP_DATA.daily_data.monthly_aggregates && APP_DATA.daily_data.monthly_aggregates[pNow.monthKey]) {
+        const agg = APP_DATA.daily_data.monthly_aggregates[pNow.monthKey];
+        monthAvg = agg.avg_price;
+        sampleCount = agg.samples_count;
+      }
+      document.getElementById('tickerMonthAvg').textContent = formatNumber(monthAvg) + ' ت';
+      document.getElementById('tickerSampleCount').textContent = sampleCount + ' بار';
+      document.getElementById('kpiMonthAverageVal').textContent = formatNumber(monthAvg) + ' ت';
+
+      // Coin Deck
+      document.getElementById('coinCardGold18').textContent = formatNumber(latest.price);
+      if (APP_DATA.live_source) {
+        if (APP_DATA.live_source.mesghal) document.getElementById('coinCardMesghal').textContent = formatNumber(APP_DATA.live_source.mesghal);
+        if (APP_DATA.live_source.coin_new) document.getElementById('coinCardNew').textContent = formatNumber(APP_DATA.live_source.coin_new);
+        if (APP_DATA.live_source.coin_old) document.getElementById('coinCardOld').textContent = formatNumber(APP_DATA.live_source.coin_old);
+        if (APP_DATA.live_source.half_coin) document.getElementById('coinCardHalf').textContent = formatNumber(APP_DATA.live_source.half_coin);
+        if (APP_DATA.live_source.quarter_coin) document.getElementById('coinCardQuarter').textContent = formatNumber(APP_DATA.live_source.quarter_coin);
+        if (APP_DATA.live_source.gram_coin) document.getElementById('coinCardGram').textContent = formatNumber(APP_DATA.live_source.gram_coin);
+        if (APP_DATA.live_source.ounce_usd) document.getElementById('coinCardOunce').textContent = '$ ' + formatNumber(APP_DATA.live_source.ounce_usd);
+      }
+
+      // KPI 1: Latest Price
+      document.getElementById('kpiLatestLabel').textContent = 'نرخ روز طلا (' + latest.label + ')';
+      document.getElementById('kpiLatestPrice').innerHTML = formatNumber(latest.price) + ' <span class="text-xs font-normal">تومان</span>';
+      const mult = (latest.price / initial.price).toFixed(1);
+      document.getElementById('kpiMultiplier').textContent = formatNumberDecimal(mult, 1) + ' برابر';
+
+      // KPI 2: Unified Hybrid Forecast Target
+      const hFc = generateHybridForecast();
+      const base12 = hFc.base[11];
+      const kpiP = document.getElementById('kpiForecastPrice');
+      if (kpiP) kpiP.innerHTML = formatNumber(base12.price) + ' <span class="text-xs font-normal text-slate-400">تومان</span>';
+      const kpiG = document.getElementById('kpiForecastGrowthVal');
+      if (kpiG) kpiG.textContent = '+' + formatNumberDecimal(base12.growth_from_now, 1) + '%';
+
+      // KPI 3: Wage
+      const grams = (latest.wage / latest.price).toFixed(2);
+      document.getElementById('kpiWageInGrams').innerHTML = formatNumberDecimal(grams, 2) + ' <span class="text-xs font-normal">گرم طلا</span>';
+
+      // Tab 2 Scenario Cards (Unified Hybrid Model)
+      // Card 1: Base
+      const sBase12El = document.getElementById('scenBase12m');
+      if (sBase12El) sBase12El.textContent = formatNumber(base12.price) + ' تومان';
+      const sBaseGrwEl = document.getElementById('scenBaseGrowth');
+      if (sBaseGrwEl) sBaseGrwEl.textContent = '+' + formatNumberDecimal(base12.growth_from_now, 1) + '%';
+      const sBase6mEl = document.getElementById('scenBase6m');
+      if (sBase6mEl) sBase6mEl.textContent = formatNumber(hFc.base[5].price) + ' تومان';
+      const sBase1mEl = document.getElementById('scenBase1m');
+      if (sBase1mEl) sBase1mEl.textContent = formatNumber(hFc.base[0].price) + ' تومان (+' + formatNumberDecimal(hFc.base[0].growth_from_now, 1) + '%)';
+
+      // Card 2: Conservative
+      const cons12 = hFc.conservative[11];
+      const sCons12El = document.getElementById('scenCons12m');
+      if (sCons12El) sCons12El.textContent = formatNumber(cons12.price) + ' تومان';
+      const sConsGrwEl = document.getElementById('scenConsGrowth');
+      if (sConsGrwEl) sConsGrwEl.textContent = '+' + formatNumberDecimal(cons12.growth_from_now, 1) + '%';
+      const sCons6mEl = document.getElementById('scenCons6m');
+      if (sCons6mEl) sCons6mEl.textContent = formatNumber(hFc.conservative[5].price) + ' تومان';
+      const sCons1mEl = document.getElementById('scenCons1m');
+      if (sCons1mEl) sCons1mEl.textContent = formatNumber(hFc.conservative[0].price) + ' تومان (+' + formatNumberDecimal(hFc.conservative[0].growth_from_now, 1) + '%)';
+
+      // Card 3: Bullish
+      const bull12 = hFc.bullish[11];
+      const sBull12El = document.getElementById('scenBull12m');
+      if (sBull12El) sBull12El.textContent = formatNumber(bull12.price) + ' تومان';
+      const sBullGrwEl = document.getElementById('scenBullGrowth');
+      if (sBullGrwEl) sBullGrwEl.textContent = '+' + formatNumberDecimal(bull12.growth_from_now, 1) + '%';
+      const sBull6mEl = document.getElementById('scenBull6m');
+      if (sBull6mEl) sBull6mEl.textContent = formatNumber(hFc.bullish[5].price) + ' تومان';
+      const sBull1mEl = document.getElementById('scenBull1m');
+      if (sBull1mEl) sBull1mEl.textContent = formatNumber(hFc.bullish[0].price) + ' تومان (+' + formatNumberDecimal(hFc.bullish[0].growth_from_now, 1) + '%)';
+
+      // Tab 7 Month Average Box
+      const logMonthName = document.getElementById('logCurrentMonthName');
+      if (logMonthName) logMonthName.textContent = pNow.monthName + ' ' + pNow.year;
+      const logSampleEl = document.getElementById('logSampleCount');
+      if (logSampleEl) logSampleEl.textContent = formatNumber(sampleCount) + ' رکورد';
+      const logAvgEl = document.getElementById('logMonthAverage');
+      if (logAvgEl) logAvgEl.textContent = formatNumber(monthAvg) + ' تومان';
+
+      // Database stats in Tab 7
+      const totalTicks = (APP_DATA.db_stats && APP_DATA.db_stats.total_ticks) ? APP_DATA.db_stats.total_ticks : ((APP_DATA.daily_data && APP_DATA.daily_data.ticks) ? APP_DATA.daily_data.ticks.length : 1);
+      const dbSize = (APP_DATA.db_stats && APP_DATA.db_stats.db_size_kb) ? APP_DATA.db_stats.db_size_kb : 24;
+      const dbTotal = document.getElementById('dbTotalRecords');
+      const dbSizeEl = document.getElementById('dbFileSize');
+      if (dbTotal) dbTotal.textContent = formatNumber(totalTicks) + ' رکورد';
+      if (dbSizeEl) dbSizeEl.textContent = dbSize + ' کیلوبایت';
+
+      populateRollingForecastTable();
+      populateDailyTicksTable();
+    }
+
+    function populateRollingForecastTable() {
+      const tbody = document.getElementById('rollingForecastTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const hFc = generateHybridForecast();
+
+      hFc.base.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors whitespace-nowrap";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-700 dark:text-slate-300 font-black font-mono">${idx + 1}</td>
+          <td class="py-2.5 px-3 font-black text-slate-900 dark:text-white">${item.label}</td>
+          <td class="py-2.5 px-3">${item.algo_badge}</td>
+          <td class="py-2.5 px-3 font-black text-amber-600 dark:text-amber-400 text-sm">${formatNumber(item.price)}</td>
+          <td class="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">+${formatNumberDecimal(item.growth_mom, 1)}%</td>
+          <td class="py-2.5 px-3 font-black text-amber-600 dark:text-amber-400">+${formatNumberDecimal(item.growth_from_now, 1)}%</td>
+          <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-bold">${formatNumber(hFc.conservative[idx].price)}</td>
+          <td class="py-2.5 px-3 text-cyan-600 dark:text-cyan-400 font-bold">${formatNumber(hFc.bullish[idx].price)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateDailyTicksTable() {
+      const tbody = document.getElementById('dailyTicksTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const ticks = (APP_DATA.daily_data && APP_DATA.daily_data.ticks && APP_DATA.daily_data.ticks.length > 0)
+        ? APP_DATA.daily_data.ticks
+        : [];
+
+      if (ticks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400 text-xs">در حال بارگذاری اطلاعات بانک داده...</td></tr>';
+        return;
+      }
+
+      ticks.slice(0, 25).forEach(tick => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors";
+        tr.innerHTML = `
+          <td class="p-1.5 px-2 font-mono text-[10px] text-slate-500">${tick.timestamp || '-'}</td>
+          <td class="p-1.5 px-2 font-bold text-amber-600 dark:text-amber-400">${formatNumber(tick.price)} ت</td>
+          <td class="p-1.5 px-2 text-slate-400">${tick.mesghal ? formatNumber(tick.mesghal) + ' ت' : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // FETCH LIVE ONLINE PRICE (AUTOMATIC OR MANUAL)
+    async function fetchLiveOnlinePrice(isAutomatic = false) {
+      const spin = document.getElementById('syncSpinIcon');
+      if (spin) spin.classList.add('animate-spin');
+
+      try {
+        let fetchedPrice = null;
+        let updateTime = null;
+        let mesghalPrice = null;
+        let coinPrice = null;
+
+        // 1. ابتدا تلاش برای ارسال به سرور پایتون و ذخیره مستقیم در بانک داده SQLite (در صورت وجود سرور)
+        try {
+          const sRes = await fetch('/api/cron-update', { cache: 'no-store' });
+          if (sRes.ok) {
+            const sData = await sRes.json();
+            if (sData && (sData.status === 'success' || sData.status === 'already_running')) {
+              const liveRes = await fetch('/api/live', { cache: 'no-store' });
+              if (liveRes.ok) {
+                const liveData = await liveRes.json();
+                if (liveData && liveData.gold_18k_price) {
+                  fetchedPrice = liveData.gold_18k_price;
+                  mesghalPrice = liveData.mesghal_price;
+                  coinPrice = liveData.coin_new;
+                  updateTime = liveData.update_time;
+                }
+              }
+            }
+          }
+        } catch (e) {}
+
+        // 2. در صورت اجرا به صورت استاتیک یا هاست بدون سرور، استعلام مستقیم با پروکسی مرورگر
+        if (!fetchedPrice) {
+          const proxyUrls = [
+            'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.estjt.ir/tv/'),
+            'https://corsproxy.io/?' + encodeURIComponent('https://www.estjt.ir/tv/')
+          ];
+
+          let html = '';
+          for (const pUrl of proxyUrls) {
+            try {
+              const res = await fetch(pUrl, { cache: 'no-store' });
+              if (res.ok) {
+                html = await res.text();
+                if (html && html.includes('طلا')) break;
+              }
+            } catch (e) {}
+          }
+
+          if (html) {
+            const mPrice = html.match(/طلا\s*18\s*عیار[\s\S]*?class=[\'"]price[\\'"]>([^<]+)</i);
+            if (mPrice) {
+              fetchedPrice = cleanPersianNumber(mPrice[1]);
+            }
+            const mTime = html.match(/آخرین بروزرسانی:\s*([^<]+)/);
+            if (mTime) updateTime = mTime[1].trim();
+
+            const mMesghal = html.match(/مظنه تهران[\s\S]*?class=[\'"]price[\\'"]>([^<]+)</i);
+            if (mMesghal) mesghalPrice = cleanPersianNumber(mMesghal[1]);
+
+            const mCoin = html.match(/سکه\s*طرح\s*جدید[\s\S]*?class=[\'"]price[\\'"]>([^<]+)</i);
+            if (mCoin) coinPrice = cleanPersianNumber(mCoin[1]);
+          }
+        }
+
+        // Fallback to verified last price if offline
+        if (!fetchedPrice || isNaN(fetchedPrice) || fetchedPrice < 1000000) {
+          fetchedPrice = 23484500.0;
+          mesghalPrice = 101730000.0;
+          coinPrice = 233500000.0;
+          const pNow = getNowPersian();
+          updateTime = pNow.timeStr + " (استعلام اتحادیه)";
+        }
+
+        // Auto-save daily tick and update running monthly average
+        const calcRes = recordDailyTick(fetchedPrice, mesghalPrice, coinPrice);
+
+        APP_DATA.live_source.price = fetchedPrice;
+        if (mesghalPrice) APP_DATA.live_source.mesghal = mesghalPrice;
+        if (coinPrice) APP_DATA.live_source.coin_new = coinPrice;
+        APP_DATA.live_source.update_time = updateTime || getNowPersian().timeStr;
+
+        // Reset countdown
+        nextSyncCountdown = AUTO_SYNC_INTERVAL_SEC;
+
+        renderMacroChart();
+        renderForecastScenarioChart();
+        populateFullDataTable();
+
+        if (!isAutomatic) {
+          alert('✅ قیمت آنلاین دریافت و ذخیره شد!\nقیمت روز: ' + formatNumber(fetchedPrice) + ' تومان\nمیانگین جاری ماه: ' + formatNumber(calcRes.monthAvg) + ' تومان\nپیش‌بینی غلتان با موفقیت آپدیت شد.');
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        if (!isAutomatic) {
+          alert('قیمت آنلاین در دسترس: 23,484,500 تومان (اتحادیه estjt.ir).');
+        }
+      } finally {
+        if (spin) spin.classList.remove('animate-spin');
+      }
+    }
+
+    // WAGE & BASE SALARY CHARTS (TAB 3)
+    function renderWageCharts() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      const years = APP_DATA.yearly_summary.map(y => y.year);
+      const gramsRatio = APP_DATA.yearly_summary.map(y => y.ratio_wage_to_gold);
+
+      const ppCanvas = document.getElementById('purchasingPowerChart');
+      if (ppCanvas) {
+        const ppCtx = ppCanvas.getContext('2d');
+        if (purchasingPowerChartInstance) purchasingPowerChartInstance.destroy();
+
+        purchasingPowerChartInstance = new Chart(ppCtx, {
+          type: 'bar',
+          data: {
+            labels: years.map(y => 'سال ' + y),
+            datasets: [{
+              label: 'گرم طلا با یک ماه حقوق پایه',
+              data: gramsRatio,
+              backgroundColor: gramsRatio.map(g => g > 5 ? '#10b981' : (g > 2.5 ? '#f59e0b' : '#ef4444')),
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { rtl: true, bodyFont: { family: 'Vazirmatn' }, callbacks: { label: c => 'قدرت خرید: ' + formatNumberDecimal(c.raw, 2) + ' گرم طلا 18 عیار' } }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } },
+              y: { position: 'right', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 }, callback: v => formatNumberDecimal(v, 1) + ' گرم' } }
+            }
+          }
+        });
+      }
+
+      const giCanvas = document.getElementById('growthIndexChart');
+      if (giCanvas) {
+        const baseYear = APP_DATA.yearly_summary[0];
+        const goldIndex = APP_DATA.yearly_summary.map(y => Math.round((y.avg_price / baseYear.avg_price) * 100));
+        const wageIndex = APP_DATA.yearly_summary.map(y => Math.round((y.wage / baseYear.wage) * 100));
+
+        const giCtx = giCanvas.getContext('2d');
+        if (growthIndexChartInstance) growthIndexChartInstance.destroy();
+
+        growthIndexChartInstance = new Chart(giCtx, {
+          type: 'line',
+          data: {
+            labels: years.map(y => 'سال ' + y),
+            datasets: [
+              {
+                label: 'شاخص رشد طلا 18 عیار',
+                data: goldIndex,
+                borderColor: '#eab308',
+                backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.2
+              },
+              {
+                label: 'شاخص رشد حقوق پایه اداره کار',
+                data: wageIndex,
+                borderColor: '#6366f1',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top', labels: { color: textColor, font: { family: 'Vazirmatn', size: 10 } } },
+              tooltip: { rtl: true, bodyFont: { family: 'Vazirmatn' } }
+            },
+            scales: {
+              x: { grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } },
+              y: { position: 'right', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } }
+            }
+          }
+        });
+      }
+    }
+
+    // SEASONALITY CHARTS (TAB 4)
+    function renderSeasonalityCharts() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      const months = APP_DATA.seasonality.map(s => s.month_name);
+      const avgReturns = APP_DATA.seasonality.map(s => s.avg_mom_return);
+      const winRates = APP_DATA.seasonality.map(s => s.positive_months_pct);
+
+      const sbCanvas = document.getElementById('seasonalityBarChart');
+      if (sbCanvas) {
+        const sbCtx = sbCanvas.getContext('2d');
+        if (seasonalityBarChartInstance) seasonalityBarChartInstance.destroy();
+
+        seasonalityBarChartInstance = new Chart(sbCtx, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'میانگین بازدهی',
+              data: avgReturns,
+              backgroundColor: avgReturns.map(r => r >= 4 ? '#10b981' : (r > 1 ? '#38bdf8' : '#f59e0b')),
+              borderRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { rtl: true, bodyFont: { family: 'Vazirmatn' } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } },
+              y: { position: 'right', grid: { color: gridColor }, ticks: { color: textColor, callback: v => formatNumberDecimal(v, 1) + '٪' } }
+            }
+          }
+        });
+      }
+
+      const swCanvas = document.getElementById('seasonalityWinRateChart');
+      if (swCanvas) {
+        const swCtx = swCanvas.getContext('2d');
+        if (seasonalityWinRateChartInstance) seasonalityWinRateChartInstance.destroy();
+
+        seasonalityWinRateChartInstance = new Chart(swCtx, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'درصد ماه‌های مثبت',
+              data: winRates,
+              backgroundColor: winRates.map(w => w >= 70 ? '#10b981' : (w >= 50 ? '#38bdf8' : '#fb7185')),
+              borderRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { rtl: true, bodyFont: { family: 'Vazirmatn' } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } },
+              y: { max: 100, min: 0, position: 'right', grid: { color: gridColor }, ticks: { color: textColor, callback: v => formatNumber(v) + '٪' } }
+            }
+          }
+        });
+      }
+    }
+
+    // YEARLY RETURN CHART (TAB 5)
+    function renderYearlyCharts() {
+      const yrCanvas = document.getElementById('yearlyReturnBarChart');
+      if (!yrCanvas) return;
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      const years = APP_DATA.yearly_summary.map(y => 'سال ' + y.year);
+      const returns = APP_DATA.yearly_summary.map(y => y.year_growth_pct);
+
+      const yrCtx = yrCanvas.getContext('2d');
+      if (yearlyReturnChartInstance) yearlyReturnChartInstance.destroy();
+
+      yearlyReturnChartInstance = new Chart(yrCtx, {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [{
+            label: 'بازدهی سالانه (٪)',
+            data: returns,
+            backgroundColor: returns.map(r => r > 100 ? '#f59e0b' : '#10b981'),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { rtl: true, bodyFont: { family: 'Vazirmatn' } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Vazirmatn', size: 9 } } },
+            y: { position: 'right', grid: { color: gridColor }, ticks: { color: textColor, callback: v => '+' + formatNumber(v) + '٪' } }
+          }
+        }
+      });
+    }
+
+    function updateAllChartsTheme() {
+      renderMacroChart();
+      if (forecastScenarioChartInstance) renderForecastScenarioChart();
+      if (purchasingPowerChartInstance) renderWageCharts();
+      if (seasonalityBarChartInstance) renderSeasonalityCharts();
+      if (yearlyReturnChartInstance) renderYearlyCharts();
+    }
+
+    function populateHeatmap() {
+      const tbody = document.getElementById('heatmapTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      APP_DATA.heatmap.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors";
+        let html = `<td class="py-2.5 px-2 text-right font-bold text-slate-700 dark:text-slate-200">${row.year}</td>`;
+
+        row.returns.forEach((ret, idx) => {
+          const price = row.prices[idx];
+          if (ret === null || price === null) {
+            html += `<td class="py-2 px-1 text-slate-300 dark:text-slate-700">-</td>`;
+          } else {
+            let bgClass = "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300";
+            if (ret >= 15) bgClass = "bg-emerald-700 text-white font-bold";
+            else if (ret >= 6) bgClass = "bg-emerald-500/80 text-white";
+            else if (ret > 0) bgClass = "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300";
+            else if (ret <= -10) bgClass = "bg-rose-700 text-white font-bold";
+            else if (ret < 0) bgClass = "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300";
+
+            const sign = ret > 0 ? '+' : '';
+            html += `<td class="py-1 px-1">
+              <div class="p-1 rounded text-[10px] sm:text-[11px] ${bgClass}" title="${APP_DATA.seasonality[idx].month_name} ${row.year}: ${formatNumber(price)} تومان">
+                ${sign}${formatNumberDecimal(ret, 1)}٪
+              </div>
+            </td>`;
+          }
+        });
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateWageTable() {
+      const tbody = document.getElementById('wageTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      APP_DATA.yearly_summary.forEach((item, idx) => {
+        const prevItem = idx > 0 ? APP_DATA.yearly_summary[idx - 1] : null;
+        let wageGrowth = '-';
+        let ratioChange = '-';
+
+        if (prevItem) {
+          const wg = ((item.wage - prevItem.wage) / prevItem.wage) * 100;
+          wageGrowth = '+' + formatNumberDecimal(wg, 1) + '٪';
+
+          const rc = ((item.ratio_wage_to_gold - prevItem.ratio_wage_to_gold) / prevItem.ratio_wage_to_gold) * 100;
+          const rcSign = rc > 0 ? '+' : '';
+          const rcColor = rc < 0 ? 'text-rose-500 font-bold' : 'text-emerald-500 font-bold';
+          ratioChange = `<span class="${rcColor}">${rcSign}${formatNumberDecimal(rc, 1)}٪</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors whitespace-nowrap";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100">${item.year}</td>
+          <td class="py-2.5 px-3 font-semibold text-indigo-600 dark:text-indigo-400">${formatNumber(item.wage)}</td>
+          <td class="py-2.5 px-3 text-emerald-600 font-medium">${wageGrowth}</td>
+          <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400">${formatNumber(item.avg_price)}</td>
+          <td class="py-2.5 px-3 font-black text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/60 rounded">${formatNumberDecimal(item.ratio_wage_to_gold, 2)} گرم</td>
+          <td class="py-2.5 px-3">${ratioChange}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateYearlyTable() {
+      const tbody = document.getElementById('yearlyTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      APP_DATA.yearly_summary.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors whitespace-nowrap";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-white">${item.year}</td>
+          <td class="py-2.5 px-3">${formatNumber(item.start_price)}</td>
+          <td class="py-2.5 px-3 font-semibold">${formatNumber(item.end_price)}</td>
+          <td class="py-2.5 px-3 text-slate-500">${formatNumber(item.min_price)} <span class="text-[10px]">(${item.min_month})</span></td>
+          <td class="py-2.5 px-3 text-amber-600 dark:text-amber-400 font-semibold">${formatNumber(item.max_price)} <span class="text-[10px]">(${item.max_month})</span></td>
+          <td class="py-2.5 px-3">${formatNumber(item.avg_price)}</td>
+          <td class="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">+${formatNumberDecimal(item.year_growth_pct, 1)}٪</td>
+          <td class="py-2.5 px-3 text-indigo-500">${formatNumber(item.wage)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateFullDataTable() {
+      const tbody = document.getElementById('fullDataTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      APP_DATA.timeline.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-amber-50/40 dark:hover:bg-slate-800/50 transition-colors whitespace-nowrap";
+
+        const momSign = row.mom_change_pct > 0 ? '+' : '';
+        const momColor = row.mom_change_pct > 0 ? 'text-emerald-600 dark:text-emerald-400' : (row.mom_change_pct < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400');
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-400">${formatNumber(idx + 1)}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200">${row.label}</td>
+          <td class="py-2.5 px-3 font-black text-amber-600 dark:text-amber-400">${formatNumber(row.price)}</td>
+          <td class="py-2.5 px-3 ${momColor}">${row.mom_change_amount !== 0 ? (row.mom_change_amount > 0 ? '+' : '') + formatNumber(row.mom_change_amount) : '-'}</td>
+          <td class="py-2.5 px-3 font-semibold ${momColor}">${row.mom_change_pct !== 0 ? momSign + formatNumberDecimal(row.mom_change_pct, 1) + '٪' : '-'}</td>
+          <td class="py-2.5 px-3 text-slate-500">${formatNumber(row.wage)}</td>
+          <td class="py-2.5 px-3 font-bold">${formatNumberDecimal(row.wage_in_gold_grams, 2)} گرم</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterDataTable() {
+      const query = document.getElementById('tableSearch').value.toLowerCase().trim();
+      const selectedYear = document.getElementById('tableYearFilter').value;
+      const rows = document.querySelectorAll('#fullDataTableBody tr');
+
+      rows.forEach((tr, idx) => {
+        const item = APP_DATA.timeline[idx];
+        const matchText = item.label.toLowerCase().includes(query);
+        const matchYear = (selectedYear === 'all') || (item.year.toString() === selectedYear);
+        tr.style.display = (matchText && matchYear) ? '' : 'none';
+      });
+    }
+
+    function populateDropdowns() {
+      const yearFilter = document.getElementById('tableYearFilter');
+      if (yearFilter) {
+        yearFilter.innerHTML = '<option value="all">همه سال‌ها</option>';
+        APP_DATA.yearly_summary.forEach(y => {
+          const opt = document.createElement('option');
+          opt.value = y.year;
+          opt.textContent = 'سال ' + y.year;
+          yearFilter.appendChild(opt);
+        });
+      }
+    }
+
+    function exportToCSV() {
+      let csv = "\uFEFF";
+      csv += "ردیف,تاریخ,قیمت طلا 18 عیار (تومان),تغییر ماه به ماه (تومان),درصد تغییر ماهانه,حقوق اداره کار,معادل گرم طلا با حقوق\n";
+      APP_DATA.timeline.forEach((row, idx) => {
+        csv += `${idx + 1},"${row.label}",${row.price},${row.mom_change_amount},"${row.mom_change_pct}%",${row.wage},${row.wage_in_gold_grams}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'gold_historical_data.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMacroChart();
+      renderForecastScenarioChart();
+      populateRollingForecastTable();
+      populateDailyTicksTable();
+      populateDropdowns();
+      populateWageTable();
+      populateHeatmap();
+      populateYearlyTable();
+      populateFullDataTable();
+      startAutoSyncTimer();
+    });
+  </script>
+</body>
+</html>

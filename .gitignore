@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment & Secrets (Never commit .env with passwords!)
+.env
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Temporary / OS files
+.DS_Store
+Thumbs.db
+*.log
+.edge_debug_profile*
+~$*.docx
+*.tmp
+
+# Local SQLite databases (optional, but keep daily_prices.json and code)
+gold_database.db
