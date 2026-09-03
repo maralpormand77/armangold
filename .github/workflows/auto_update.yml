@@ -1,0 +1,40 @@
+name: بروزرسانی خودکار هر ۳۰ دقیقه قیمت طلا و ذخیره در بانک داده
+
+on:
+  schedule:
+    # اجرا هر ۳۰ دقیقه یکبار به صورت ۲۴ ساعته در ۷ روز هفته در سرورهای ابری گیت‌هاب (کاملاً رایگان)
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # امکان اجرای دستی با یک کلیک از تب Actions
+
+jobs:
+  update-gold:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: دریافت کد منبع
+        uses: actions/checkout@v4
+
+      - name: راه‌اندازی پایتون
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: نصب وابستگی‌ها
+        run: |
+          pip install -r requirements.txt
+
+      - name: استعلام آنلاین قیمت طلا از اتحادیه و محاسبه پیش‌بینی و ذخیره در بانک داده
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python update_live_price.py
+
+      - name: ثبت تغییرات و ذخیره در ریپازیتوری
+        run: |
+          git config --global user.name "Gold Price AutoBot"
+          git config --global user.email "bot@github.com"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "بروزرسانی خودکار ۳۰ دقیقه‌ای نرخ طلا و شبکه عصبی LSTM [skip ci]" && git push)
