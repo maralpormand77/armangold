@@ -1429,7 +1429,7 @@ def build():
     // App State
     let APP_DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
     let currentScale = 'linear';
-    let macroChartInstance = null;
+    window.macroChartInstance = null;
     let momChartInstance = null;
     let forecastScenarioChartInstance = null;
     let purchasingPowerChartInstance = null;
