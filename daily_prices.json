@@ -1,14 +1,14 @@
 {
   "ticks": [
     {
-      "timestamp": "21 شهریور 1405 - 01:16:26",
+      "timestamp": "21 شهریور 1405 - 05:57:24",
       "date": "1405/06/21",
       "year": 1405,
       "month": 6,
       "month_name": "شهریور",
       "day": 21,
-      "price": 24047800.0,
-      "mesghal": 104170000.0,
+      "price": 24387100.0,
+      "mesghal": 105640000.0,
       "coin_new": 240000000.0
     }
   ],
@@ -19,10 +19,10 @@
       "month_name": "شهریور",
       "label": "شهریور 1405",
       "samples_count": 1,
-      "avg_price": 24047800.0,
-      "latest_price": 24047800.0
+      "avg_price": 24387100.0,
+      "latest_price": 24387100.0
     }
   },
-  "last_sync": "21 شهریور 1405 - 01:16:26",
+  "last_sync": "21 شهریور 1405 - 05:57:24",
   "total_db_records": 1
 }
