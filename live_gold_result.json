@@ -1,13 +1,13 @@
 {
-  "gold_18k_price": 23720000.0,
-  "mesghal_price": 102750000.0,
+  "gold_18k_price": 23535300.0,
+  "mesghal_price": 101950000.0,
   "gold_24k_price": 31300000.0,
-  "ounce_usd": 4354.0,
-  "coin_new": 236000000.0,
-  "coin_old": 234500000.0,
-  "half_coin": 120500000.0,
-  "quarter_coin": 63500000.0,
+  "ounce_usd": 4338.0,
+  "coin_new": 234500000.0,
+  "coin_old": 232300000.0,
+  "half_coin": 119000000.0,
+  "quarter_coin": 63300000.0,
   "gram_coin": 33000000.0,
-  "update_time": "۳۰ شهریور ۱۴۰۵ - ۱۰:۵۰:۰۲",
+  "update_time": "۳۰ شهریور ۱۴۰۵ - ۱۷:۵۲:۰۹",
   "source": "https://www.estjt.ir/"
 }
