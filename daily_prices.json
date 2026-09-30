@@ -1,15 +1,15 @@
 {
   "ticks": [
     {
-      "timestamp": "8 مهر 1405 - 06:04:46",
+      "timestamp": "8 مهر 1405 - 12:49:15",
       "date": "1405/07/08",
       "year": 1405,
       "month": 7,
       "month_name": "مهر",
       "day": 8,
-      "price": 25705300.0,
-      "mesghal": 111350000.0,
-      "coin_new": 260000000.0
+      "price": 25509100.0,
+      "mesghal": 110500000.0,
+      "coin_new": 258300000.0
     }
   ],
   "monthly_aggregates": {
@@ -19,10 +19,10 @@
       "month_name": "مهر",
       "label": "مهر 1405",
       "samples_count": 1,
-      "avg_price": 25705300.0,
-      "latest_price": 25705300.0
+      "avg_price": 25509100.0,
+      "latest_price": 25509100.0
     }
   },
-  "last_sync": "8 مهر 1405 - 06:04:46",
+  "last_sync": "8 مهر 1405 - 12:49:15",
   "total_db_records": 1
 }
