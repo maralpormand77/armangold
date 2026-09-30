@@ -2,6 +2,12 @@
   "version": 2,
   "cleanUrls": true,
   "framework": null,
+  "crons": [
+    {
+      "path": "/api/cron-update",
+      "schedule": "*/30 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

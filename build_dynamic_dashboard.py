@@ -103,11 +103,41 @@ def build():
                 }
             }
 
-    # Update Shahrivar 1405 price with live estjt.ir price
-    data['timeline'][-1]['price'] = live_price
-    data['timeline'][-1]['mom_change_amount'] = live_price - data['timeline'][-2]['price']
-    data['timeline'][-1]['mom_change_pct'] = round(((live_price - data['timeline'][-2]['price']) / data['timeline'][-2]['price']) * 100, 2)
-    data['timeline'][-1]['wage_in_gold_grams'] = round(data['timeline'][-1]['wage'] / live_price, 2)
+    # Update or advance timeline to current Jalali month with live price
+    import datetime
+    try:
+        from update_live_price import gregorian_to_jalali, MONTHS_ORDER
+        now = datetime.datetime.now()
+        jy, jm, jd = gregorian_to_jalali(now.year, now.month, now.day)
+        current_label = f"{MONTHS_ORDER[jm - 1]} {jy}"
+        last_item = data['timeline'][-1]
+
+        if jy > last_item['year'] or (jy == last_item['year'] and jm > last_item['month_idx']):
+            prev_price = last_item['price']
+            prev_wage = last_item.get('wage', 22000000.0)
+            new_entry = {
+                'year': jy,
+                'month_idx': jm,
+                'month_name': MONTHS_ORDER[jm - 1],
+                'label': current_label,
+                'short_label': f"{jy}/{jm:02d}",
+                'price': live_price,
+                'wage': prev_wage,
+                'wage_in_gold_grams': round(prev_wage / live_price, 2),
+                'mom_change_amount': round(live_price - prev_price, 0),
+                'mom_change_pct': round(((live_price - prev_price) / prev_price) * 100, 2),
+                'yoy_change_amount': round(live_price - data['timeline'][-13]['price'], 0) if len(data['timeline']) >= 13 else 0.0,
+                'yoy_change_pct': round(((live_price - data['timeline'][-13]['price']) / data['timeline'][-13]['price']) * 100, 2) if len(data['timeline']) >= 13 else 0.0
+            }
+            data['timeline'].append(new_entry)
+        else:
+            data['timeline'][-1]['price'] = live_price
+            prev_price = data['timeline'][-2]['price'] if len(data['timeline']) >= 2 else live_price
+            data['timeline'][-1]['mom_change_amount'] = live_price - prev_price
+            data['timeline'][-1]['mom_change_pct'] = round(((live_price - prev_price) / prev_price) * 100, 2)
+            data['timeline'][-1]['wage_in_gold_grams'] = round(data['timeline'][-1]['wage'] / live_price, 2)
+    except Exception as e:
+        data['timeline'][-1]['price'] = live_price
 
     data['records']['latest_price'] = live_price
     data['records']['total_growth_multiplier'] = round(live_price / data['records']['initial_price'], 1)
@@ -287,7 +317,7 @@ def build():
       <div class="flex items-center gap-2 flex-wrap">
         <span class="font-bold text-amber-600 dark:text-amber-400">📡 نرخ روز طلای ۱۸ عیار:</span>
         <span id="tickerLivePrice" class="font-black text-slate-900 dark:text-white bg-amber-400/20 px-2 py-0.5 rounded-lg border border-amber-400/30 text-sm">
-          ۲۳,۴۸۴,۵۰۰ تومان
+          {live_price:,.0f} تومان
         </span>
         <span class="text-slate-400 text-[11px]">|</span>
         <span class="text-slate-500 dark:text-slate-400 text-[11px]" id="tickerUpdateTime">
@@ -295,9 +325,9 @@ def build():
         </span>
       </div>
       <div class="flex items-center gap-2 text-[11px] text-cyan-600 dark:text-cyan-400 font-bold">
-        <span>📊 میانگین جاری این ماه: <strong id="tickerMonthAvg" class="text-slate-900 dark:text-white bg-cyan-400/20 px-1.5 py-0.5 rounded">۲۳,۴۷۹,۹۰۰ ت</strong></span>
+        <span>📊 میانگین جاری این ماه: <strong id="tickerMonthAvg" class="text-slate-900 dark:text-white bg-cyan-400/20 px-1.5 py-0.5 rounded">{live_price:,.0f} ت</strong></span>
         <span class="text-slate-400">|</span>
-        <span>تعداد ثبت‌ها: <strong id="tickerSampleCount">۳ بار</strong></span>
+        <span>تعداد ثبت‌ها: <strong id="tickerSampleCount">فعال</strong></span>
       </div>
     </div>
   </div>
@@ -313,11 +343,11 @@ def build():
           <span class="text-emerald-500 font-bold text-[10px] sm:text-xs bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded">استعلام زنده</span>
         </div>
         <div class="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight" id="kpiLatestPrice">
-          ۲۳,۴۸۴,۵۰۰ <span class="text-[11px] sm:text-xs font-normal text-slate-500 dark:text-slate-400">تومان</span>
+          {live_price:,.0f} <span class="text-[11px] sm:text-xs font-normal text-slate-500 dark:text-slate-400">تومان</span>
         </div>
         <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
           <span>میانگین ماه:</span>
-          <span class="font-bold text-slate-800 dark:text-slate-200" id="kpiMonthAverageVal">۲۳,۴۷۹,۹۰۰ ت</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200" id="kpiMonthAverageVal">{live_price:,.0f} ت</span>
         </div>
       </div>
 
@@ -386,35 +416,35 @@ def build():
       <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs">
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">طلا ۱۸ عیار</span>
-          <span class="font-black text-amber-600 dark:text-amber-400 block" id="coinCardGold18">۲۳,۴۸۴,۵۰۰</span>
+          <span class="font-black text-amber-600 dark:text-amber-400 block" id="coinCardGold18">{live_price:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">مظنه تهران (مثقال)</span>
-          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardMesghal">۱۰۱,۷۳۰,۰۰۰</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardMesghal">{mesghal_price:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه طرح جدید (امامی)</span>
-          <span class="font-black text-amber-500 block" id="coinCardNew">۲۳۳,۵۰۰,۰۰۰</span>
+          <span class="font-black text-amber-500 block" id="coinCardNew">{coin_new:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه بهار آزادی</span>
-          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardOld">۲۳۰,۵۰۰,۰۰۰</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardOld">{coin_old:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">نیم سکه</span>
-          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardHalf">۱۱۹,۵۰۰,۰۰۰</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardHalf">{half_coin:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">ربع سکه</span>
-          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardQuarter">۶۴,۵۰۰,۰۰۰</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardQuarter">{quarter_coin:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">سکه یک گرمی</span>
-          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardGram">۳۵,۰۰۰,۰۰۰</span>
+          <span class="font-black text-slate-800 dark:text-slate-200 block" id="coinCardGram">{gram_coin:,.0f}</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60">
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mb-1">انس جهانی طلا</span>
-          <span class="font-black text-cyan-500 block" id="coinCardOunce">$ ۴,۴۸۵</span>
+          <span class="font-black text-cyan-500 block" id="coinCardOunce">$ {ounce_usd:,.0f}</span>
         </div>
       </div>
     </section>
@@ -1282,31 +1312,31 @@ def build():
           <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-2 text-xs mb-4">
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">قیمت هر گرم طلای ۱۸ عیار:</span>
-              <span id="syncPanelGoldPrice" class="font-black text-sm text-emerald-600 dark:text-emerald-400">۲۳,۴۸۴,۵۰۰ تومان</span>
+              <span id="syncPanelGoldPrice" class="font-black text-sm text-emerald-600 dark:text-emerald-400">{live_price:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">مظنه تهران (هر مثقال):</span>
-              <span id="syncPanelMesghal" class="font-bold">۱۰۱,۷۳۰,۰۰۰ تومان</span>
+              <span id="syncPanelMesghal" class="font-bold">{mesghal_price:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">سکه تمام طرح جدید (امامی):</span>
-              <span id="syncPanelCoinNew" class="font-bold text-amber-500">۲۳۳,۵۰۰,۰۰۰ تومان</span>
+              <span id="syncPanelCoinNew" class="font-bold text-amber-500">{coin_new:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">سکه بهار آزادی (طرح قدیم):</span>
-              <span id="syncPanelCoinOld" class="font-bold">۲۳۰,۵۰۰,۰۰۰ تومان</span>
+              <span id="syncPanelCoinOld" class="font-bold">{coin_old:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">نیم سکه بهار آزادی:</span>
-              <span id="syncPanelHalfCoin" class="font-bold">۱۱۹,۵۰۰,۰۰۰ تومان</span>
+              <span id="syncPanelHalfCoin" class="font-bold">{half_coin:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">ربع سکه بهار آزادی:</span>
-              <span id="syncPanelQuarterCoin" class="font-bold">۶۴,۵۰۰,۰۰۰ تومان</span>
+              <span id="syncPanelQuarterCoin" class="font-bold">{quarter_coin:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center py-1 border-b border-emerald-200/60 dark:border-emerald-800/60">
               <span class="text-slate-600 dark:text-slate-300">سکه یک گرمی:</span>
-              <span id="syncPanelGramCoin" class="font-bold">۳۵,۰۰۰,۰۰۰ تومان</span>
+              <span id="syncPanelGramCoin" class="font-bold">{gram_coin:,.0f} تومان</span>
             </div>
             <div class="flex justify-between items-center pt-2">
               <span class="text-slate-500 dark:text-slate-400">زمان آخرین استعلام:</span>
@@ -2477,81 +2507,162 @@ def build():
         let updateTime = null;
         let mesghalPrice = null;
         let coinPrice = null;
+        let coinOldPrice = null;
+        let halfCoinPrice = null;
+        let quarterCoinPrice = null;
+        let gramCoinPrice = null;
+        let gold24kPrice = null;
+        let ounceUsdPrice = null;
 
-        // ۱. ابتدا تلاش برای ارسال به سرور پایتون و ذخیره مستقیم در بانک داده SQLite (در صورت وجود سرور)
+        // ۱. استعلام از اندپوینت /api/live (سرورلس ورسل یا سرور لوکال پایتون)
         try {{
-          const sRes = await fetch('/api/cron-update', {{ cache: 'no-store' }});
-          if (sRes.ok) {{
-            const sData = await sRes.json();
-            if (sData && (sData.status === 'success' || sData.status === 'already_running')) {{
-              const liveRes = await fetch('/api/live', {{ cache: 'no-store' }});
-              if (liveRes.ok) {{
-                const liveData = await liveRes.json();
-                if (liveData && liveData.gold_18k_price) {{
-                  fetchedPrice = liveData.gold_18k_price;
-                  mesghalPrice = liveData.mesghal_price;
-                  coinPrice = liveData.coin_new;
-                  updateTime = liveData.update_time;
-                }}
-              }}
+          const liveRes = await fetch('/api/live', {{ cache: 'no-store' }});
+          if (liveRes.ok) {{
+            const liveData = await liveRes.json();
+            if (liveData && (liveData.gold_18k_price || liveData.price)) {{
+              fetchedPrice = liveData.gold_18k_price || liveData.price;
+              mesghalPrice = liveData.mesghal_price || liveData.mesghal;
+              coinPrice = liveData.coin_new;
+              coinOldPrice = liveData.coin_old;
+              halfCoinPrice = liveData.half_coin;
+              quarterCoinPrice = liveData.quarter_coin;
+              gramCoinPrice = liveData.gram_coin;
+              gold24kPrice = liveData.gold_24k_price || liveData.gold_24k;
+              ounceUsdPrice = liveData.ounce_usd;
+              updateTime = liveData.update_time;
             }}
           }}
         }} catch (e) {{}}
 
-        // ۲. در صورت اجرا به صورت استاتیک یا هاست بدون سرور، استعلام مستقیم با پروکسی مرورگر
+        // ۲. در صورت عدم دسترسی، تلاش از اندپوینت /api/cron-update
         if (!fetchedPrice) {{
-          const proxyUrls = [
-            'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.estjt.ir/tv/'),
-            'https://corsproxy.io/?' + encodeURIComponent('https://www.estjt.ir/tv/')
-          ];
-
-          let html = '';
-          for (const pUrl of proxyUrls) {{
-            try {{
-              const res = await fetch(pUrl, {{ cache: 'no-store' }});
-              if (res.ok) {{
-                html = await res.text();
-                if (html && html.includes('طلا')) break;
+          try {{
+            const sRes = await fetch('/api/cron-update', {{ cache: 'no-store' }});
+            if (sRes.ok) {{
+              const sData = await sRes.json();
+              if (sData && (sData.gold_18k_price || sData.price)) {{
+                fetchedPrice = sData.gold_18k_price || sData.price;
+                mesghalPrice = sData.mesghal_price || sData.mesghal;
+                coinPrice = sData.coin_new;
+                coinOldPrice = sData.coin_old;
+                halfCoinPrice = sData.half_coin;
+                quarterCoinPrice = sData.quarter_coin;
+                gramCoinPrice = sData.gram_coin;
+                gold24kPrice = sData.gold_24k_price;
+                ounceUsdPrice = sData.ounce_usd;
+                updateTime = sData.update_time;
               }}
-            }} catch (e) {{}}
-          }}
-
-          if (html) {{
-            const mPrice = html.match(/طلا\\s*۱۸\\s*عیار[\\s\\S]*?class=[\\'"]price[\\\\'"]>([^<]+)</i);
-            if (mPrice) {{
-              fetchedPrice = cleanPersianNumber(mPrice[1]);
             }}
-            const mTime = html.match(/آخرین بروزرسانی:\\s*([^<]+)/);
-            if (mTime) updateTime = mTime[1].trim();
+          }} catch (e) {{}}
+        }}
 
-            const mMesghal = html.match(/مظنه تهران[\\s\\S]*?class=[\\'"]price[\\\\'"]>([^<]+)</i);
-            if (mMesghal) mesghalPrice = cleanPersianNumber(mMesghal[1]);
+        // ۳. در صورت عدم دسترسی به APIهای هاست، تلاش مستقیم از سرور جهانی TGJU
+        if (!fetchedPrice) {{
+          try {{
+            const tgjuRes = await fetch('https://call.tgju.org/ajax.json', {{ cache: 'no-store' }});
+            if (tgjuRes.ok) {{
+              const tData = await tgjuRes.json();
+              const curr = tData?.current;
+              if (curr && curr.geram18 && curr.geram18.p) {{
+                const g18Rials = cleanPersianNumber(curr.geram18.p);
+                fetchedPrice = Math.round(g18Rials / 10);
+                if (curr.mesghal && curr.mesghal.p) {{
+                  mesghalPrice = Math.round(cleanPersianNumber(curr.mesghal.p) / 10);
+                }}
+                const cNewRials = cleanPersianNumber(curr.sekee?.p || curr.retail_sekee?.p);
+                if (cNewRials) coinPrice = Math.round(cNewRials / 10);
+                const cOldRials = cleanPersianNumber(curr.sekeb?.p || curr.retail_sekeb?.p);
+                if (cOldRials) coinOldPrice = Math.round(cOldRials / 10);
+                const halfRials = cleanPersianNumber(curr.nim?.p);
+                if (halfRials) halfCoinPrice = Math.round(halfRials / 10);
+                const qRials = cleanPersianNumber(curr.rob?.p);
+                if (qRials) quarterCoinPrice = Math.round(qRials / 10);
+                const gramRials = cleanPersianNumber(curr.gerami?.p);
+                if (gramRials) gramCoinPrice = Math.round(gramRials / 10);
+                if (curr.ons && curr.ons.p) ounceUsdPrice = cleanPersianNumber(curr.ons.p);
+                updateTime = curr.geram18.t ? (curr.geram18.t + ' (TGJU)') : getNowPersian().timeStr;
+              }}
+            }}
+          }} catch (e) {{}}
+        }}
 
-            const mCoin = html.match(/سکه\\s*طرح\\s*جدید[\\s\\S]*?class=[\\'"]price[\\\\'"]>([^<]+)</i);
-            if (mCoin) coinPrice = cleanPersianNumber(mCoin[1]);
+        // محافظت حیاتی: در صورت قطع کامل اینترنت، هرگز قیمت صفحه را با عدد قدیمی مخدوش نکن!
+        if (!fetchedPrice || isNaN(fetchedPrice) || fetchedPrice < 1000000) {{
+          if (!APP_DATA.live_source.price || APP_DATA.live_source.price < 1000000) {{
+            fetchedPrice = 25442100.0;
+            mesghalPrice = 110210000.0;
+            coinPrice = 257900000.0;
+            const pNow = getNowPersian();
+            updateTime = pNow.timeStr + " (استعلام آفلاین)";
+          }} else {{
+            // حفظ آخرین داده‌های معتبر موجود روی صفحه
+            if (spin) spin.classList.remove('animate-spin');
+            nextSyncCountdown = AUTO_SYNC_INTERVAL_SEC;
+            return;
           }}
         }}
 
-        // Fallback to verified last price if offline
-        if (!fetchedPrice || isNaN(fetchedPrice) || fetchedPrice < 1000000) {{
-          fetchedPrice = 23484500.0;
-          mesghalPrice = 101730000.0;
-          coinPrice = 233500000.0;
-          const pNow = getNowPersian();
-          updateTime = pNow.timeStr + " (استعلام اتحادیه)";
-        }}
-
-        // Auto-save daily tick and update running monthly average
+        // ذخیره تیک روزانه و محاسبه میانگین متحرک ماه جاری
         const calcRes = recordDailyTick(fetchedPrice, mesghalPrice, coinPrice);
 
+        // بروزرسانی ساختار داده اپلیکیشن
         APP_DATA.live_source.price = fetchedPrice;
         if (mesghalPrice) APP_DATA.live_source.mesghal = mesghalPrice;
         if (coinPrice) APP_DATA.live_source.coin_new = coinPrice;
+        if (coinOldPrice) APP_DATA.live_source.coin_old = coinOldPrice;
+        if (halfCoinPrice) APP_DATA.live_source.half_coin = halfCoinPrice;
+        if (quarterCoinPrice) APP_DATA.live_source.quarter_coin = quarterCoinPrice;
+        if (gramCoinPrice) APP_DATA.live_source.gram_coin = gramCoinPrice;
+        if (gold24kPrice) APP_DATA.live_source.gold_24k = gold24kPrice;
+        if (ounceUsdPrice) APP_DATA.live_source.ounce_usd = ounceUsdPrice;
         APP_DATA.live_source.update_time = updateTime || getNowPersian().timeStr;
 
-        // Reset countdown
+        // بروزرسانی آخرین رکورد در نمودارها
+        if (APP_DATA.timeline && APP_DATA.timeline.length > 0) {{
+          APP_DATA.timeline[APP_DATA.timeline.length - 1].price = fetchedPrice;
+        }}
+
+        // بروزرسانی مستقیم المان‌های پنل استعلام زنده
+        const elSyncGold = document.getElementById('syncPanelGoldPrice');
+        if (elSyncGold) elSyncGold.textContent = formatNumber(fetchedPrice) + ' تومان';
+        const elSyncMesghal = document.getElementById('syncPanelMesghal');
+        if (elSyncMesghal && mesghalPrice) elSyncMesghal.textContent = formatNumber(mesghalPrice) + ' تومان';
+        const elSyncCoinNew = document.getElementById('syncPanelCoinNew');
+        if (elSyncCoinNew && coinPrice) elSyncCoinNew.textContent = formatNumber(coinPrice) + ' تومان';
+        const elSyncCoinOld = document.getElementById('syncPanelCoinOld');
+        if (elSyncCoinOld && coinOldPrice) elSyncCoinOld.textContent = formatNumber(coinOldPrice) + ' تومان';
+        const elSyncHalf = document.getElementById('syncPanelHalfCoin');
+        if (elSyncHalf && halfCoinPrice) elSyncHalf.textContent = formatNumber(halfCoinPrice) + ' تومان';
+        const elSyncQuarter = document.getElementById('syncPanelQuarterCoin');
+        if (elSyncQuarter && quarterCoinPrice) elSyncQuarter.textContent = formatNumber(quarterCoinPrice) + ' تومان';
+        const elSyncGram = document.getElementById('syncPanelGramCoin');
+        if (elSyncGram && gramCoinPrice) elSyncGram.textContent = formatNumber(gramCoinPrice) + ' تومان';
+        const elSyncTime = document.getElementById('syncPanelTime');
+        if (elSyncTime) elSyncTime.textContent = APP_DATA.live_source.update_time;
+
+        // بروزرسانی المان‌های کارت‌های بالای صفحه
+        const elCoinGold18 = document.getElementById('coinCardGold18');
+        if (elCoinGold18) elCoinGold18.textContent = formatNumber(fetchedPrice);
+        const elCoinMesghal = document.getElementById('coinCardMesghal');
+        if (elCoinMesghal && mesghalPrice) elCoinMesghal.textContent = formatNumber(mesghalPrice);
+        const elCoinNew = document.getElementById('coinCardNew');
+        if (elCoinNew && coinPrice) elCoinNew.textContent = formatNumber(coinPrice);
+        const elCoinOld = document.getElementById('coinCardOld');
+        if (elCoinOld && coinOldPrice) elCoinOld.textContent = formatNumber(coinOldPrice);
+        const elCoinHalf = document.getElementById('coinCardHalf');
+        if (elCoinHalf && halfCoinPrice) elCoinHalf.textContent = formatNumber(halfCoinPrice);
+        const elCoinQuarter = document.getElementById('coinCardQuarter');
+        if (elCoinQuarter && quarterCoinPrice) elCoinQuarter.textContent = formatNumber(quarterCoinPrice);
+        const elCoinGram = document.getElementById('coinCardGram');
+        if (elCoinGram && gramCoinPrice) elCoinGram.textContent = formatNumber(gramCoinPrice);
+        const elCoinOunce = document.getElementById('coinCardOunce');
+        if (elCoinOunce && ounceUsdPrice) elCoinOunce.textContent = '$ ' + formatNumber(ounceUsdPrice);
+
+        // بازنشانی زمان‌سنج استعلام دوره‌ای
         nextSyncCountdown = AUTO_SYNC_INTERVAL_SEC;
 
+        // رندر مجدد KPIها و تمام نمودارها
+        updateKPIsAndForecastSummary();
         renderMacroChart();
         renderForecastScenarioChart();
         populateFullDataTable();
@@ -2562,7 +2673,7 @@ def build():
       }} catch (err) {{
         console.error("Fetch error:", err);
         if (!isAutomatic) {{
-          alert('قیمت آنلاین در دسترس: ۲۳,۴۸۴,۵۰۰ تومان (اتحادیه estjt.ir).');
+          alert('خطا در استعلام قیمت زنده. لطفاً وضعیت اتصال اینترنت را بررسی فرمایید.');
         }}
       }} finally {{
         if (spin) spin.classList.remove('animate-spin');
@@ -3603,6 +3714,9 @@ def build():
       populateFullDataTable();
       updateAdvisorMarketSignals();
       startAutoSyncTimer();
+      setTimeout(() => {{
+        fetchLiveOnlinePrice(true);
+      }}, 1000);
     }});
   </script>
   <!-- ========================================================================= -->
