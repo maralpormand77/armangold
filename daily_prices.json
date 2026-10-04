@@ -1,6 +1,17 @@
 {
   "ticks": [
     {
+      "timestamp": "12 مهر 1405 - 22:03:13",
+      "date": "1405/07/12",
+      "year": 1405,
+      "month": 7,
+      "month_name": "مهر",
+      "day": 12,
+      "price": 26446300.0,
+      "mesghal": 114560000.0,
+      "coin_new": 271100000.0
+    },
+    {
       "timestamp": "12 مهر 1405 - 20:22:51",
       "date": "1405/07/12",
       "year": 1405,
@@ -159,11 +170,11 @@
       "month": 7,
       "month_name": "مهر",
       "label": "مهر 1405",
-      "samples_count": 6,
-      "avg_price": 25743383.0,
-      "latest_price": 26432500.0
+      "samples_count": 7,
+      "avg_price": 25843800.0,
+      "latest_price": 26446300.0
     }
   },
-  "last_sync": "12 مهر 1405 - 20:22:51",
-  "total_db_records": 13
+  "last_sync": "12 مهر 1405 - 22:03:13",
+  "total_db_records": 14
 }

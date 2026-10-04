@@ -342,7 +342,7 @@ def build():
   <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6">
 
     <!-- KPI HIGHLIGHT CARDS -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
       <!-- KPI 1: Live & Monthly Avg -->
       <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-amber-400/60 transition-all col-span-1">
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
@@ -375,21 +375,7 @@ def build():
         </div>
       </div>
 
-      <!-- KPI 3: Wage -->
-      <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-rose-400/60 transition-all col-span-1">
-        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
-          <span>قدرت خرید حقوق پایه</span>
-          <span class="text-rose-500 font-bold text-[10px] sm:text-xs">سقوط ۹۰٪</span>
-        </div>
-        <div class="text-lg sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight" id="kpiWageInGrams">
-          ۰.۹۴ <span class="text-[11px] sm:text-xs font-normal text-slate-500 dark:text-slate-400">گرم طلا</span>
-        </div>
-        <div class="mt-1 sm:mt-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
-          از ۹.۴ گرم در سال ۹۵ به کمتر از ۱ گرم رسیده است
-        </div>
-      </div>
-
-      <!-- KPI 4: Multiplier -->
+      <!-- KPI 3: Multiplier -->
       <div class="glass-card rounded-2xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden group hover:border-indigo-400/60 transition-all col-span-1">
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs font-medium mb-1">
           <span>ضریب کل رشد طلا</span>
@@ -600,8 +586,7 @@ def build():
 
         <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
           <div class="flex flex-wrap items-center gap-1 text-[11px] sm:text-xs">
-            <button onclick="filterTimeline('all')" class="time-filter active px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-amber-400 text-slate-900 font-bold" data-range="all">همه سال‌ها + آینده</button>
-            <button onclick="filterTimeline('3y')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="3y">۳ سال اخیر + آینده</button>
+            <button onclick="filterTimeline('3y')" class="time-filter active px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-amber-400 text-slate-900 font-bold" data-range="3y">۳ سال اخیر + آینده</button>
             <button onclick="filterTimeline('5y')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="5y">۵ سال اخیر</button>
             <button onclick="filterTimeline('early')" class="time-filter px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-range="early">سال‌های اولیه (۹۵-۹۹)</button>
           </div>
@@ -632,22 +617,6 @@ def build():
           <div class="text-slate-400 text-[11px]">
             ⚡ سیستم به طور خودکار روزانه قیمت‌ها را ذخیره کرده و میانگین ماه را آپدیت می‌کند.
           </div>
-        </div>
-      </div>
-
-      <div class="glass-card rounded-2xl p-3.5 sm:p-5 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <div>
-            <h3 class="text-xs sm:text-base font-bold">نوسان ماه به ماه طلا (بازدهی ماهانه ٪)</h3>
-            <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">میزان رشد یا افت قیمت در هر ماه در طول تاریخ ۱۰ ساله</p>
-          </div>
-          <div class="text-[10px] sm:text-xs flex items-center gap-2">
-            <span class="text-emerald-500 font-semibold">▲ سبز: ماه مثبت</span>
-            <span class="text-rose-500 font-semibold">▼ قرمز: ماه منفی</span>
-          </div>
-        </div>
-        <div class="relative w-full h-[200px] sm:h-[240px]">
-          <canvas id="momReturnsChart"></canvas>
         </div>
       </div>
     </div>
@@ -1478,7 +1447,7 @@ def build():
     let seasonalityBarChartInstance = null;
     let seasonalityWinRateChartInstance = null;
     let yearlyReturnChartInstance = null;
-    let currentTimelineFilter = 'all';
+    let currentTimelineFilter = '3y';
     let isForecastVisible = true;
     let currentForecastScenario = 'base';
 
@@ -2174,11 +2143,13 @@ def build():
     }}
 
     function renderMoMChart(histSubset, gridColor, textColor) {{
+      const momCanvas = document.getElementById('momReturnsChart');
+      if (!momCanvas) return;
       const momLabels = histSubset.map(t => t.short_label);
       const momValues = histSubset.map(t => t.mom_change_pct);
       const barColors = momValues.map(v => v >= 0 ? '#10b981' : '#f43f5e');
 
-      const momCtx = document.getElementById('momReturnsChart').getContext('2d');
+      const momCtx = momCanvas.getContext('2d');
       if (momChartInstance) momChartInstance.destroy();
 
       momChartInstance = new Chart(momCtx, {{
@@ -2398,9 +2369,12 @@ def build():
       const kpiG = document.getElementById('kpiForecastGrowthVal');
       if (kpiG) kpiG.textContent = '+' + formatNumberDecimal(base12.growth_from_now, 1) + '%';
 
-      // KPI 3: Wage
-      const grams = (latest.wage / latest.price).toFixed(2);
-      document.getElementById('kpiWageInGrams').innerHTML = formatNumberDecimal(grams, 2) + ' <span class="text-xs font-normal">گرم طلا</span>';
+      // KPI: Wage (if element exists)
+      const wageEl = document.getElementById('kpiWageInGrams');
+      if (wageEl) {{
+        const grams = (latest.wage / latest.price).toFixed(2);
+        wageEl.innerHTML = formatNumberDecimal(grams, 2) + ' <span class="text-xs font-normal">گرم طلا</span>';
+      }}
 
       // Tab 2 Scenario Cards (Unified Hybrid Model)
       // Card 1: Base
