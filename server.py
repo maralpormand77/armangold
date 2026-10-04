@@ -24,7 +24,6 @@ import datetime
 
 # تنظیم پورت پویا متناسب با هاست‌های ابری (مانند Render و Railway)
 PORT = int(os.environ.get("PORT", 8080))
-AUTO_SYNC_INTERVAL_SEC = 30 * 60  # ۳۰ دقیقه
 SERVER_START_TIME = time.time()
 LAST_SYNC_TIME = None
 IS_UPDATING = False
@@ -39,7 +38,7 @@ def get_local_ip():
     except Exception:
         return '127.0.0.1'
 
-def perform_price_update(trigger_source="زمان‌بند خودکار سرور"):
+def perform_price_update(trigger_source="استعلام زنده"):
     """اجرای استعلام زنده و ذخیره در بانک داده SQLite"""
     global LAST_SYNC_TIME, IS_UPDATING
     if IS_UPDATING:
@@ -47,16 +46,16 @@ def perform_price_update(trigger_source="زمان‌بند خودکار سرور
     
     IS_UPDATING = True
     try:
-        print(f"\n[🔄 شروع استعلام قیمت - منبع: {trigger_source}]...", flush=True)
+        print(f"\n[🔄 شروع استعلام نرخ زنده - منبع: {trigger_source}]...", flush=True)
         import update_live_price
         update_live_price.run_update()
         LAST_SYNC_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"✅ [موفقیت] نرخ‌ها در بانک داده SQLite ذخیره و داشبورد با هر دو مدل پیش‌بینی فصلی و LSTM بروزرسانی شد.\n", flush=True)
+        print(f"✅ [موفقیت] نرخ‌های زنده دریافت، در بانک داده ذخیره و داشبورد بازسازی شد.\n", flush=True)
         return {
             "status": "success",
             "trigger_source": trigger_source,
             "last_sync": LAST_SYNC_TIME,
-            "message": "استعلام با موفقیت در بانک داده ذخیره شد."
+            "message": "استعلام با موفقیت انجام شد."
         }
     except Exception as e:
         print(f"❌ [خطا در استعلام قیمت]: {e}", flush=True)
@@ -67,21 +66,11 @@ def perform_price_update(trigger_source="زمان‌بند خودکار سرور
     finally:
         IS_UPDATING = False
 
-def auto_update_job():
-    """ترد پس‌زمینه برای بروزرسانی خودکار هر ۳۰ دقیقه حتی وقتی هیچ کاربری سایت را باز نکرده است"""
-    time.sleep(5)  # وقفه کوتاه پس از روشن شدن سرور
-    # اجرای اولین استعلام هنگام شروع به کار سرور
-    perform_price_update("استعلام اولیه هنگام راه‌اندازی سرور")
-    
-    while True:
-        time.sleep(AUTO_SYNC_INTERVAL_SEC)
-        perform_price_update("زمان‌بند دوره‌ای ۳۰ دقیقه‌ای سرور")
-
 class ProductionHTTPHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With')
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
         super().end_headers()
 
@@ -94,47 +83,23 @@ class ProductionHTTPHandler(http.server.SimpleHTTPRequestHandler):
         if not req_path:
             req_path = '/'
 
-        # ۱. اندپوینت کرون و وب‌هوک برای هاست‌های ابری و سرویس‌های کرون‌جاب خارجی (مانند cron-job.org و UptimeRobot)
-        if req_path in ['/api/cron-update', '/api/update', '/cron']:
-            res = perform_price_update("کرون‌جاب وب‌هوک /api/cron-update")
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps(res, ensure_ascii=False).encode('utf-8'))
-            return
+        # ۱. اندپوینت استعلام زنده و بهینه‌سازی شده نرخ طلا و سکه‌ها
+        if req_path in ['/api/live', '/api/refresh']:
+            should_refresh = ('refresh' in self.path) or ('live' in self.path)
+            
+            # اگر درخواست رفرش شده باشد یا فایل وجود نداشته باشد یا بیش از ۶۰ ثانیه گذشته باشد
+            is_stale = True
+            if os.path.exists('live_gold_result.json'):
+                try:
+                    age = time.time() - os.path.getmtime('live_gold_result.json')
+                    if age < 45:
+                        is_stale = False
+                except Exception:
+                    pass
 
-        # ۲. اندپوینت پایش سلامت سرور (Health check)
-        elif req_path in ['/api/health', '/api/status', '/ping']:
-            import database
-            uptime_seconds = int(time.time() - SERVER_START_TIME)
-            health_info = {
-                "status": "healthy",
-                "uptime_seconds": uptime_seconds,
-                "uptime_human": f"{uptime_seconds // 3600} ساعت و {(uptime_seconds % 3600) // 60} دقیقه",
-                "last_sync_time": LAST_SYNC_TIME,
-                "auto_sync_interval_minutes": AUTO_SYNC_INTERVAL_SEC // 60,
-                "database_stats": database.get_stats(),
-                "cloud_environment": os.environ.get("RENDER", "no") == "true" or "PORT" in os.environ,
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps(health_info, ensure_ascii=False).encode('utf-8'))
-            return
+            if should_refresh or is_stale or not LAST_SYNC_TIME:
+                perform_price_update("درخواست کاربر یا استعلام برخط")
 
-        # ۳. اندپوینت آمار بانک داده SQLite
-        elif req_path == '/api/db-stats':
-            import database
-            stats = database.get_stats()
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps(stats, ensure_ascii=False).encode('utf-8'))
-            return
-
-        # ۴. اندپوینت آخرین نرخ‌های زنده و سکه‌ها
-        elif req_path == '/api/live':
             data = {}
             if os.path.exists('live_gold_result.json'):
                 try:
@@ -148,12 +113,51 @@ class ProductionHTTPHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
             return
 
+        # ۲. اندپوینت وب‌هوک و کرون
+        elif req_path in ['/api/cron-update', '/api/update', '/cron']:
+            res = perform_price_update("درخواست وب‌هوک /api/update")
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(json.dumps(res, ensure_ascii=False).encode('utf-8'))
+            return
+
+        # ۳. اندپوینت پایش سلامت سرور (Health check)
+        elif req_path in ['/api/health', '/api/status', '/ping']:
+            import database
+            uptime_seconds = int(time.time() - SERVER_START_TIME)
+            health_info = {
+                "status": "healthy",
+                "mode": "live_realtime",
+                "uptime_seconds": uptime_seconds,
+                "uptime_human": f"{uptime_seconds // 3600} ساعت و {(uptime_seconds % 3600) // 60} دقیقه",
+                "last_sync_time": LAST_SYNC_TIME,
+                "database_stats": database.get_stats(),
+                "cloud_environment": os.environ.get("RENDER", "no") == "true" or "PORT" in os.environ,
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(json.dumps(health_info, ensure_ascii=False).encode('utf-8'))
+            return
+
+        # ۴. اندپوینت آمار بانک داده SQLite
+        elif req_path == '/api/db-stats':
+            import database
+            stats = database.get_stats()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(json.dumps(stats, ensure_ascii=False).encode('utf-8'))
+            return
+
         # ۵. ارسال فایل‌های استاتیک عادی وب‌سایت
         super().do_GET()
 
     def do_POST(self):
         # پشتیبانی از متد POST برای اندپوینت آپدیت
-        if self.path.startswith('/api/update') or self.path.startswith('/api/cron-update'):
+        if self.path.startswith('/api/update') or self.path.startswith('/api/cron-update') or self.path.startswith('/api/live'):
             res = perform_price_update("درخواست دستی POST")
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -190,10 +194,9 @@ def run_server():
     server_thread.start()
     print(f"\n🌐 سرور وب با موفقیت روی پورت {PORT} شروع به کار کرد.", flush=True)
 
-    # فعال‌سازی زمان‌بند ۳۰ دقیقه‌ای در پس‌زمینه
-    auto_thread = threading.Thread(target=auto_update_job, daemon=True)
-    auto_thread.start()
-    print("⏱️ زمان‌بند خودکار ۳۰ دقیقه‌ای فعال شد (حتی بدون حضور کاربر استعلام و ذخیره انجام می‌شود).", flush=True)
+    # استعلام اولیه هنگام شروع به کار سرور
+    threading.Thread(target=perform_price_update, args=("راه‌اندازی سرور و استعلام زنده اولیه",), daemon=True).start()
+    print("📡 سامانه استعلام زنده و برخط نرخ طلا و مسکوکات فعال شد.", flush=True)
 
     # راه‌اندازی تانل اینترنتی رایگان فقط در محیط محلی (در محیط‌های ابری مانند Render خود هاست دامنه عمومی می‌دهد)
     if not is_cloud and sys.platform == 'win32':

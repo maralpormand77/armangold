@@ -68,7 +68,7 @@ def fetch_from_estjt(host="estjt.ir"):
     data = urllib.parse.urlencode({'action': 'new_price'}).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers)
     
-    with urllib.request.urlopen(req, timeout=10) as response:
+    with urllib.request.urlopen(req, timeout=4) as response:
         res_json = json.loads(response.read().decode('utf-8', errors='ignore'))
         gold_html = res_json.get('gold', '')
         coin_html = res_json.get('coin', '')
