@@ -205,6 +205,11 @@ def fetch_live_gold_and_coins():
     raise RuntimeError("تمامی منابع استعلام نرخ آنلاین طلا (اتحادیه و TGJU) در دسترس نیستند.")
 
 def run_update():
+    # جلوگیری از اجرای زمان‌بندی ۳۰ دقیقه‌ای گیت‌هاب و توقف ارسال کامیت‌های مکرر
+    if os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('GITHUB_EVENT_NAME') == 'schedule':
+        print("[اطلاع] استعلام زمان‌بندی ۳۰ دقیقه‌ای متوقف شده و سیستم به نمایش زنده ارتقا یافته است.", flush=True)
+        return False
+
     print("در حال استعلام آخرین نرخ طلا و انواع سکه از سامانه‌های رسمی...", flush=True)
     try:
         info = fetch_live_gold_and_coins()
